@@ -21,53 +21,52 @@ const server = http.createServer(app);
 
 app.set("trust proxy", 1);
 
-// Socket.io setup with CORS
-const io = socketIo(server, {
-  cors: {
-    origin: [
-      "http://localhost:5173",
-      "http://localhost:5174",
-      process.env.FRONTEND_URL,
-    ].filter(Boolean),
-    methods: ["GET", "POST"],
-    credentials: true,
-  },
-  transports: ["websocket", "polling"],
-});
-
-// CORS configuration
+// CORS configuration logic - Shared between Express and Socket.io
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
 ];
 
 if (process.env.FRONTEND_URL) {
-  // Add original and without trailing slash
   const frontendUrl = process.env.FRONTEND_URL.replace(/\/$/, "");
   allowedOrigins.push(frontendUrl);
   allowedOrigins.push(`${frontendUrl}/`);
 }
 
+const checkOrigin = (origin, callback) => {
+  // Allow requests with no origin (like mobile apps or curl requests)
+  if (!origin) return callback(null, true);
+  
+  const isAllowed = allowedOrigins.indexOf(origin) !== -1;
+  const isVercelPreview = origin.endsWith(".vercel.app");
+  const isDev = process.env.NODE_ENV === 'development';
+
+  if (isAllowed || isVercelPreview || isDev) {
+    callback(null, true);
+  } else {
+    console.log("CORS blocked for origin:", origin);
+    callback(new Error("Not allowed by CORS"));
+  }
+};
+
+// Socket.io setup with CORS
+const io = socketIo(server, {
+  cors: {
+    origin: checkOrigin,
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
+  transports: ["websocket", "polling"],
+});
+
+// Express CORS middleware
 app.use(
   Cors({
-    origin: function (origin, callback) {
-      // Allow requests with no origin (like mobile apps or curl requests)
-      if (!origin) return callback(null, true);
-      
-      const isAllowed = allowedOrigins.indexOf(origin) !== -1;
-      const isVercelPreview = origin.endsWith(".vercel.app");
-      const isDev = process.env.NODE_ENV === 'development';
-
-      if (isAllowed || isVercelPreview || isDev) {
-        callback(null, true);
-      } else {
-        console.log("CORS blocked for origin:", origin);
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
+    origin: checkOrigin,
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: [
+
       "Origin",
       "X-Requested-With",
       "Content-Type",
