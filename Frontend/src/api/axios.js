@@ -1,5 +1,5 @@
 import axios from "axios";
-import { logApiCall, handleApiError } from "../utils/apiUtils.js";
+import { logApiCall, handleApiError } from "../utils/apiutils.js";
 
 // 🔧 DEVELOPMENT TOGGLE - Change this to switch between local and hosted
 const USE_LOCAL_SERVER = import.meta.env.VITE_USE_LOCAL_SERVER === "true"; // Check .env file first, fallback to false
