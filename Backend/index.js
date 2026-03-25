@@ -36,13 +36,30 @@ const io = socketIo(server, {
 });
 
 // CORS configuration
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5174",
+];
+
+if (process.env.FRONTEND_URL) {
+  // Add original and without trailing slash
+  const frontendUrl = process.env.FRONTEND_URL.replace(/\/$/, "");
+  allowedOrigins.push(frontendUrl);
+  allowedOrigins.push(`${frontendUrl}/`);
+}
+
 app.use(
   Cors({
-    origin: [
-      "http://localhost:5173",
-      "http://localhost:5174",
-      process.env.FRONTEND_URL,
-    ].filter(Boolean),
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.indexOf(origin) !== -1 || (process.env.NODE_ENV === 'development')) {
+        callback(null, true);
+      } else {
+        console.log("CORS blocked for origin:", origin);
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: [
