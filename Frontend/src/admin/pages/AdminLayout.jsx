@@ -132,9 +132,19 @@ export default function AdminLayout() {
                             <h2 className="text-sm font-bold text-slate-700 tracking-tight">{pageLabel}</h2>
                         </div>
                     </div>
-                    <div className="flex items-center gap-2 bg-indigo-50 px-3 py-1.5 rounded-full border border-indigo-100">
-                        <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" />
-                        <span className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest">Live</span>
+                    <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2 bg-indigo-50 px-3 py-1.5 rounded-full border border-indigo-100">
+                            <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" />
+                            <span className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest">Live</span>
+                        </div>
+                        {/* Mobile Logout */}
+                        <button
+                            onClick={handleLogout}
+                            title="Sign Out"
+                            className="md:hidden flex items-center justify-center w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-red-50 hover:text-red-500 transition-colors"
+                        >
+                            <FiLogOut size={14} />
+                        </button>
                     </div>
                 </header>
 
