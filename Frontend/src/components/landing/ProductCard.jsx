@@ -292,27 +292,31 @@ const ProductCard = ({ product, onViewDetails }) => {
 
 
         {/* ACTIONS (TOP RIGHT) */}
-        <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
+        <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300 z-20">
           {/* Wishlist Button */}
           <button
             onClick={handleToggleWishlist}
             className={`p-2 rounded-full backdrop-blur-sm transition-all duration-200 transform hover:scale-110 active:scale-95 ${isWishlisted
               ? 'bg-red-50 text-red-500 shadow-md'
-              : 'bg-white/90 text-gray-400 hover:text-red-500 hover:bg-white'
+              : 'bg-white/80 text-gray-500 hover:text-red-500 hover:bg-white shadow-sm'
               }`}
-            title={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+            title={isWishlisted ? "Remove from Wishlist" : "Add to Wishlist"}
           >
             {isWishlisted ? (
-              <HeartSolid className="h-5 w-5 animate-pulse" />
+              <HeartSolid className="h-5 w-5" />
             ) : (
               <HeartOutline className="h-5 w-5" />
             )}
           </button>
 
-          {/* Quick View Button */}
+          {/* View Details Button */}
           <button
-            onClick={() => onViewDetails?.(product)}
-            className="bg-white/90 backdrop-blur-sm text-[#782355] p-2 rounded-full hover:bg-white transition-colors duration-200 shadow-sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              onViewDetails?.(product);
+            }}
+            className="p-2 rounded-full bg-white/80 backdrop-blur-sm text-gray-500 hover:text-[#782355] hover:bg-white shadow-sm transition-all duration-200 transform hover:scale-110 active:scale-95"
+            title="View Details"
           >
             <EyeIcon className="h-5 w-5" />
           </button>

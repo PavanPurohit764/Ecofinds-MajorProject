@@ -146,7 +146,7 @@ const MyListings = () => {
         {/* Tabs */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 mb-6">
           <div className="border-b border-gray-200">
-            <nav className="flex space-x-8 px-6">
+            <nav className="flex space-x-8 px-6 overflow-x-auto scrollbar-hide">
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
@@ -247,7 +247,7 @@ const MyListings = () => {
                       View Details
                     </button>
 
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="flex flex-col sm:grid sm:grid-cols-3 gap-2">
                       <button
                         onClick={() => handleToggleStatus(product._id)}
                         className={`flex items-center justify-center gap-1 py-2 rounded-lg transition-colors duration-200 ${product.isActive

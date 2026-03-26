@@ -35,20 +35,9 @@ export default function AdminLayout() {
 
     return (
         <div className="min-h-screen flex bg-[#f1f5f9] font-sans antialiased overflow-hidden">
-            
-            {/* ── Mobile Backdrop ── */}
-            {sidebarOpen && (
-                <div 
-                    className="fixed inset-0 bg-black/50 z-20 md:hidden" 
-                    onClick={() => setSidebarOpen(false)}
-                />
-            )}
-
-            {/* ── Sidebar ── */}
+            {/* ── Desktop Sidebar ── */}
             <aside
-                className={`fixed md:relative flex flex-col z-30 transition-all duration-300 ease-in-out flex-shrink-0 ${
-                    sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
-                }`}
+                className={`hidden md:flex flex-col z-30 transition-all duration-300 ease-in-out flex-shrink-0`}
                 style={{ width: sidebarOpen ? 252 : 72, minHeight: "100vh" }}
             // Deep navy sidebar — industrial look
             >
@@ -138,11 +127,8 @@ export default function AdminLayout() {
                 {/* Topbar */}
                 <header className="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-6 z-20 shadow-sm flex-shrink-0">
                     <div className="flex items-center gap-4">
-                        <button className="text-slate-400 hover:text-slate-600 md:hidden" onClick={() => setSidebarOpen(true)}>
-                            <FiMenu size={22} />
-                        </button>
                         <div className="flex items-center gap-2">
-                            <span className="text-slate-300">/</span>
+                            <span className="text-slate-300 hidden md:inline">/</span>
                             <h2 className="text-sm font-bold text-slate-700 tracking-tight">{pageLabel}</h2>
                         </div>
                     </div>
@@ -153,7 +139,7 @@ export default function AdminLayout() {
                 </header>
 
                 {/* Content */}
-                <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 sm:p-6 lg:p-8">
+                <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 sm:p-6 lg:p-8 pb-24 md:pb-8">
                     <div className="max-w-7xl mx-auto w-full">
                         <Routes>
                             <Route index element={<Navigate to="overview" replace />} />
@@ -166,6 +152,36 @@ export default function AdminLayout() {
                     </div>
                 </main>
             </div>
+
+            {/* ── Mobile Sticky Bottom Nav (below md) ── */}
+            <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-slate-200 shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.1)]">
+                <ul className="flex items-stretch justify-around">
+                    {NAV.map((item) => (
+                        <li key={item.to} className="flex-1">
+                            <NavLink
+                                to={`/admin/${item.to}`}
+                                className={({ isActive }) =>
+                                    `flex flex-col items-center justify-center w-full py-2.5 gap-1 transition-colors relative ${
+                                        isActive ? "text-indigo-600" : "text-slate-400 hover:text-slate-600"
+                                    }`
+                                }
+                            >
+                                {({ isActive }) => (
+                                    <>
+                                        <span className="text-xl flex-shrink-0">{item.icon}</span>
+                                        <span className={`text-[10px] font-bold leading-none ${isActive ? "text-indigo-600" : "text-slate-500"}`}>
+                                            {item.label}
+                                        </span>
+                                        {isActive && (
+                                            <span className="absolute top-0 w-full h-0.5 bg-indigo-600" />
+                                        )}
+                                    </>
+                                )}
+                            </NavLink>
+                        </li>
+                    ))}
+                </ul>
+            </nav>
         </div>
     );
 }

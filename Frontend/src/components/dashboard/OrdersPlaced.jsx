@@ -213,7 +213,7 @@ const OrdersPlaced = () => {
                       </div>
 
                       {/* Middle: Grid Details */}
-                      <div className="xl:w-1/2 grid grid-cols-2 gap-y-8 gap-x-4">
+                      <div className="xl:w-1/2 grid grid-cols-1 sm:grid-cols-2 gap-y-8 gap-x-4">
                         <div className="flex items-start gap-4">
                           <div className="mt-1 p-2 bg-slate-50 rounded-xl text-slate-400">
                             <ShoppingBagIcon className="h-5 w-5" />

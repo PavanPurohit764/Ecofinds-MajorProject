@@ -264,30 +264,30 @@ const MyProfile = () => {
             {/* Profile Information */}
             <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
               <div className="p-6 border-b border-gray-200">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                   <h2 className="text-xl font-bold text-gray-900">
                     Profile Information
                   </h2>
                   {!isEditing ? (
                     <button
                       onClick={handleEdit}
-                      className="flex items-center gap-2 bg-[#782355] text-white px-4 py-2 rounded-lg hover:bg-[#8e2a63] transition-colors duration-200"
+                      className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#782355] text-white px-4 py-2 rounded-lg hover:bg-[#8e2a63] transition-colors duration-200"
                     >
                       <PencilIcon className="h-4 w-4" />
                       Edit Profile
                     </button>
                   ) : (
-                    <div className="flex gap-2">
+                    <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                       <button
                         onClick={handleSave}
-                        className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors duration-200"
+                        className="w-full sm:w-auto flex items-center justify-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors duration-200"
                       >
                         <CheckIcon className="h-4 w-4" />
                         Save Changes
                       </button>
                       <button
                         onClick={handleCancel}
-                        className="flex items-center gap-2 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors duration-200"
+                        className="w-full sm:w-auto flex items-center justify-center gap-2 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors duration-200"
                       >
                         <XMarkIcon className="h-4 w-4" />
                         Cancel
