@@ -202,146 +202,171 @@ const AllProductsPage = () => {
         </div>
       </div>
 
+      {/* Mobile Filter Drawer Overlay */}
+      {showFilters && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={() => setShowFilters(false)}
+        />
+      )}
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex gap-8">
-          {/* Filters Sidebar */}
-          <div className={`${
-            showFilters ? 'block' : 'hidden'
-          } lg:block fixed lg:static inset-0 lg:inset-auto z-50 lg:z-auto bg-black/50 lg:bg-transparent`}>
-            <div className="bg-white lg:bg-transparent h-full lg:h-auto w-80 lg:w-64 overflow-y-auto lg:overflow-visible">
-              <div className="p-6 lg:p-0">
-                {/* Mobile Close Button */}
-                <div className="lg:hidden flex items-center justify-between mb-6">
-                  <h3 className="text-lg font-semibold">Filters</h3>
-                  <button onClick={() => setShowFilters(false)}>
-                    <XMarkIcon className="h-6 w-6" />
-                  </button>
+          {/* Filters Sidebar — desktop: static column | mobile: slide-in drawer */}
+          <aside
+            className={`
+              fixed top-0 left-0 h-full w-80 bg-white z-50 shadow-2xl overflow-y-auto
+              transition-transform duration-300 ease-in-out
+              lg:static lg:w-64 lg:shadow-none lg:z-auto lg:translate-x-0 lg:h-auto lg:overflow-visible
+              ${showFilters ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+            `}
+          >
+            <div className="p-5">
+              {/* Mobile Header */}
+              <div className="lg:hidden flex items-center justify-between mb-5 pb-4 border-b border-gray-200">
+                <h3 className="text-lg font-bold text-gray-900 flex items-center">
+                  <AdjustmentsHorizontalIcon className="h-5 w-5 mr-2 text-[#782355]" />
+                  Filters
+                </h3>
+                <button
+                  onClick={() => setShowFilters(false)}
+                  className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                >
+                  <XMarkIcon className="h-6 w-6 text-gray-600" />
+                </button>
+              </div>
+
+              {/* Desktop Header */}
+              <div className="hidden lg:flex items-center justify-between mb-6">
+                <h3 className="text-lg font-semibold flex items-center">
+                  <AdjustmentsHorizontalIcon className="h-5 w-5 mr-2" />
+                  Filters
+                </h3>
+                <button
+                  onClick={clearFilters}
+                  className="text-sm text-[#782355] hover:underline"
+                >
+                  Clear All
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                {/* Category Filter */}
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-3">Category</h4>
+                  <div className="space-y-2">
+                    {categories.map((category) => (
+                      <label key={category} className="flex items-center cursor-pointer group">
+                        <input
+                          type="radio"
+                          name="category"
+                          value={category}
+                          checked={selectedCategory === category}
+                          onChange={(e) => {
+                            setSelectedCategory(e.target.value);
+                            setShowFilters(false); // auto-close on mobile
+                          }}
+                          className="mr-3 text-[#782355] focus:ring-[#782355]"
+                        />
+                        <span className="text-gray-700 group-hover:text-[#782355] transition-colors text-sm">{category}</span>
+                      </label>
+                    ))}
+                  </div>
                 </div>
 
-                <div className="bg-white lg:bg-white rounded-xl lg:rounded-lg p-6 lg:p-4 shadow-lg lg:shadow-none">
-                  <div className="hidden lg:flex items-center justify-between mb-6">
-                    <h3 className="text-lg font-semibold flex items-center">
-                      <AdjustmentsHorizontalIcon className="h-5 w-5 mr-2" />
-                      Filters
-                    </h3>
-                    <button
-                      onClick={clearFilters}
-                      className="text-sm text-[#782355] hover:underline"
-                    >
-                      Clear All
-                    </button>
+                {/* Condition Filter */}
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-3">Condition</h4>
+                  <div className="space-y-2">
+                    {conditions.map((condition) => (
+                      <label key={condition} className="flex items-center cursor-pointer group">
+                        <input
+                          type="radio"
+                          name="condition"
+                          value={condition}
+                          checked={selectedCondition === condition}
+                          onChange={(e) => setSelectedCondition(e.target.value)}
+                          className="mr-3 text-[#782355] focus:ring-[#782355]"
+                        />
+                        <span className="text-gray-700 group-hover:text-[#782355] transition-colors text-sm">{condition}</span>
+                      </label>
+                    ))}
                   </div>
+                </div>
 
-                  <div className="space-y-6">
-                    {/* Category Filter */}
-                    <div>
-                      <h4 className="font-semibold text-gray-900 mb-3">Category</h4>
-                      <div className="space-y-2">
-                        {categories.map((category) => (
-                          <label key={category} className="flex items-center">
-                            <input
-                              type="radio"
-                              name="category"
-                              value={category}
-                              checked={selectedCategory === category}
-                              onChange={(e) => setSelectedCategory(e.target.value)}
-                              className="mr-3 text-[#782355] focus:ring-[#782355]"
-                            />
-                            <span className="text-gray-700">{category}</span>
-                          </label>
-                        ))}
-                      </div>
+                {/* Price Range */}
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-3">Price Range</h4>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="number"
+                        placeholder="Min"
+                        value={priceRange[0]}
+                        onChange={(e) => setPriceRange([parseInt(e.target.value) || 0, priceRange[1]])}
+                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#782355]"
+                      />
+                      <span className="text-gray-500 text-sm flex-shrink-0">to</span>
+                      <input
+                        type="number"
+                        placeholder="Max"
+                        value={priceRange[1]}
+                        onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value) || 200000])}
+                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#782355]"
+                      />
                     </div>
-
-                    {/* Condition Filter */}
-                    <div>
-                      <h4 className="font-semibold text-gray-900 mb-3">Condition</h4>
-                      <div className="space-y-2">
-                        {conditions.map((condition) => (
-                          <label key={condition} className="flex items-center">
-                            <input
-                              type="radio"
-                              name="condition"
-                              value={condition}
-                              checked={selectedCondition === condition}
-                              onChange={(e) => setSelectedCondition(e.target.value)}
-                              className="mr-3 text-[#782355] focus:ring-[#782355]"
-                            />
-                            <span className="text-gray-700">{condition}</span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Price Range */}
-                    <div>
-                      <h4 className="font-semibold text-gray-900 mb-3">Price Range</h4>
-                      <div className="space-y-3">
-                        <div className="flex items-center gap-3">
-                          <input
-                            type="number"
-                            placeholder="Min"
-                            value={priceRange[0]}
-                            onChange={(e) => setPriceRange([parseInt(e.target.value) || 0, priceRange[1]])}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#782355]"
-                          />
-                          <span className="text-gray-500">to</span>
-                          <input
-                            type="number"
-                            placeholder="Max"
-                            value={priceRange[1]}
-                            onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value) || 200000])}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#782355]"
-                          />
-                        </div>
-                        <div className="text-sm text-gray-600">
-                          ₹{priceRange[0].toLocaleString()} - ₹{priceRange[1].toLocaleString()}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Location Filter */}
-                    <div>
-                      <h4 className="font-semibold text-gray-900 mb-3">Location</h4>
-                      <select
-                        value={selectedLocation}
-                        onChange={(e) => setSelectedLocation(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#782355]"
-                      >
-                        {locations.map((location) => (
-                          <option key={location} value={location}>
-                            {location}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    {/* Apply Filters Button (Mobile) */}
-                    <div className="lg:hidden pt-4">
-                      <button
-                        onClick={() => setShowFilters(false)}
-                        className="w-full bg-[#782355] text-white py-3 rounded-lg font-semibold"
-                      >
-                        Apply Filters
-                      </button>
+                    <div className="text-xs text-gray-500">
+                      ₹{priceRange[0].toLocaleString()} – ₹{priceRange[1].toLocaleString()}
                     </div>
                   </div>
+                </div>
+
+                {/* Location Filter */}
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-3">Location</h4>
+                  <select
+                    value={selectedLocation}
+                    onChange={(e) => setSelectedLocation(e.target.value)}
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#782355]"
+                  >
+                    {locations.map((location) => (
+                      <option key={location} value={location}>
+                        {location}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Mobile Action Buttons */}
+                <div className="lg:hidden pt-4 space-y-2">
+                  <button
+                    onClick={() => setShowFilters(false)}
+                    className="w-full bg-[#782355] text-white py-3 rounded-lg font-semibold hover:bg-[#8e2a63] transition-colors"
+                  >
+                    Apply Filters
+                  </button>
+                  <button
+                    onClick={() => { clearFilters(); setShowFilters(false); }}
+                    className="w-full border border-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
+                  >
+                    Clear All
+                  </button>
                 </div>
               </div>
             </div>
-          </div>
+          </aside>
 
           {/* Main Content */}
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             {/* Sort and View Options */}
-            <div className="bg-white rounded-xl p-4 mb-6 shadow-sm">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <span className="text-gray-600">Sort by:</span>
+            <div className="bg-white rounded-xl p-3 sm:p-4 mb-6 shadow-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-600 text-sm whitespace-nowrap">Sort by:</span>
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
-                    className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#782355]"
+                    className="flex-1 sm:flex-none border border-gray-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#782355]"
                   >
                     {sortOptions.map((option) => (
                       <option key={option.value} value={option.value}>
@@ -351,7 +376,7 @@ const AllProductsPage = () => {
                   </select>
                 </div>
 
-                <div className="flex items-center gap-2 text-sm text-gray-600">
+                <div className="text-sm text-gray-500">
                   <span>Showing {products.length} of {pagination.total || products.length} products</span>
                 </div>
               </div>
@@ -359,7 +384,7 @@ const AllProductsPage = () => {
 
             {/* Products Grid */}
             {products.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-3 sm:gap-5">
                 {products.map((product) => (
                   <ProductCard
                     key={product._id}
@@ -381,17 +406,17 @@ const AllProductsPage = () => {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-12">
-                <div className="text-gray-400 mb-4">
+              <div className="text-center py-16">
+                <div className="text-gray-300 mb-4">
                   <svg className="mx-auto h-16 w-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.034 0-3.9.785-5.291 2.09M6.343 6.343A8 8 0 1017.657 17.657 8 8 0 006.343 6.343z" />
                   </svg>
                 </div>
                 <h3 className="text-lg font-medium text-gray-900 mb-2">No products found</h3>
-                <p className="text-gray-600 mb-4">Try adjusting your filters to see more results</p>
+                <p className="text-gray-500 mb-6 text-sm">Try adjusting your filters to see more results</p>
                 <button
                   onClick={clearFilters}
-                  className="bg-[#782355] text-white px-6 py-2 rounded-lg hover:bg-[#8e2a63] transition-colors duration-200"
+                  className="bg-[#782355] text-white px-6 py-2.5 rounded-lg hover:bg-[#8e2a63] transition-colors"
                 >
                   Clear Filters
                 </button>
@@ -400,7 +425,7 @@ const AllProductsPage = () => {
 
             {/* Load More Button */}
             {products.length > 0 && pagination.hasNext && (
-              <div className="text-center mt-12">
+              <div className="text-center mt-10">
                 <button 
                   onClick={loadMoreProducts}
                   disabled={loading}
@@ -414,7 +439,7 @@ const AllProductsPage = () => {
             {/* Error State */}
             {error && (
               <div className="text-center py-12">
-                <p className="text-red-600 mb-4">{error}</p>
+                <p className="text-red-500 mb-4 text-sm">{error}</p>
                 <button 
                   onClick={() => {
                     setError(null);

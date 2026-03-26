@@ -22,7 +22,7 @@ const Navbar = () => {
   const [isSearching, setIsSearching] = useState(false);
   const { isAuthenticated, logout } = useAuth();
   const { getCartItemsCount } = useCart();
-  console.log('nav', isAuthenticated)
+
 
   const navigate = useNavigate();
   const searchRef = useRef(null);

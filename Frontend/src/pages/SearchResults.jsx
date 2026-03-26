@@ -1,7 +1,13 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { searchItems } from '../services/searchService';
-import { MagnifyingGlassIcon, ChevronLeftIcon, HeartIcon } from '@heroicons/react/24/outline';
+import {
+  MagnifyingGlassIcon,
+  ChevronLeftIcon,
+  HeartIcon,
+  FunnelIcon,
+  XMarkIcon
+} from '@heroicons/react/24/outline';
 import { HeartIcon as HeartSolidIcon } from '@heroicons/react/24/solid';
 
 const SearchResults = () => {
@@ -14,6 +20,7 @@ const SearchResults = () => {
   const [searchInfo, setSearchInfo] = useState({});
   const [sortBy, setSortBy] = useState('featured');
   const [favorites, setFavorites] = useState(new Set());
+  const [isFilterOpen, setIsFilterOpen] = useState(false); // Mobile filter toggle
   
   // Filter states
   const [filters, setFilters] = useState({
@@ -222,11 +229,23 @@ const SearchResults = () => {
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600">Sort by:</span>
+              <button
+                className="lg:hidden flex items-center text-gray-700 bg-gray-100 px-3 py-1.5 rounded-md text-sm font-medium"
+                onClick={() => setIsFilterOpen(true)}
+              >
+                <FunnelIcon className="h-4 w-4 mr-1.5" />
+                Filters
+                {(filters.condition !== 'all' || filters.minPrice || filters.maxPrice || filters.location) && (
+                  <span className="ml-1.5 bg-[#9d174d] text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center">
+                    !
+                  </span>
+                )}
+              </button>
+              <span className="hidden sm:inline text-sm text-gray-600">Sort by:</span>
               <select 
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#9d174d] focus:border-transparent"
+                className="border border-gray-300 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#9d174d] focus:border-transparent"
               >
                 <option value="featured">Featured</option>
                 <option value="price-low">Price: Low to High</option>
@@ -234,7 +253,7 @@ const SearchResults = () => {
                 <option value="newest">Newest First</option>
               </select>
             </div>
-            <div className="text-sm text-gray-500">
+            <div className="text-sm text-gray-500 hidden sm:block">
               Showing {filteredResults.length} of {searchInfo.totalCount} products
             </div>
           </div>
@@ -243,16 +262,27 @@ const SearchResults = () => {
 
       {/* Results Section with Filters */}
       <div className="max-w-7xl mx-auto px-4 py-6">
-        <div className="flex gap-8">
-          {/* Filters Sidebar - Always visible */}
-          <div className="w-64 flex-shrink-0">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Filters Sidebar - Mobile Drawer & Desktop Sidebar */}
+          
+          {/* Mobile backdrop */}
+          {isFilterOpen && (
+            <div
+              className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+              onClick={() => setIsFilterOpen(false)}
+            />
+          )}
+
+          <div
+            className={`fixed inset-y-0 left-0 bg-white z-50 w-[80%] max-w-sm transform transition-transform duration-300 ease-in-out lg:static lg:transform-none lg:w-64 lg:flex-shrink-0 overflow-y-auto ${
+              isFilterOpen ? "translate-x-0" : "-translate-x-full"
+            }`}
+          >
+            <div className="bg-white rounded-none lg:rounded-lg shadow-none lg:shadow-sm border-0 lg:border border-gray-200 p-6 min-h-screen lg:min-h-0">
               {/* Filters Header */}
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z" />
-                  </svg>
+                  <FunnelIcon className="w-5 h-5 mr-2" />
                   Filters
                   {(filters.condition !== 'all' || filters.minPrice || filters.maxPrice || filters.location) && (
                     <span className="ml-2 px-2 py-1 text-xs bg-[#9d174d] text-white rounded-full">
@@ -260,13 +290,21 @@ const SearchResults = () => {
                     </span>
                   )}
                 </h3>
-                <button
-                  onClick={clearAllFilters}
-                  className="text-sm text-[#9d174d] hover:text-[#7f1d1d] font-medium disabled:opacity-50"
-                  disabled={filters.condition === 'all' && !filters.minPrice && !filters.maxPrice && !filters.location}
-                >
-                  Clear All
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={clearAllFilters}
+                    className="text-sm text-[#9d174d] hover:text-[#7f1d1d] font-medium disabled:opacity-50"
+                    disabled={filters.condition === 'all' && !filters.minPrice && !filters.maxPrice && !filters.location}
+                  >
+                    Clear All
+                  </button>
+                  <button
+                    className="lg:hidden p-1 text-gray-400 hover:text-gray-500"
+                    onClick={() => setIsFilterOpen(false)}
+                  >
+                    <XMarkIcon className="h-6 w-6" />
+                  </button>
+                </div>
               </div>
 
               {/* Condition Filter */}
@@ -370,7 +408,7 @@ const SearchResults = () => {
                 )}
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
                 {filteredResults.map((item, index) => {
                   const itemId = item._id || `${item.source}-${index}`;
                   const isFavorite = favorites.has(itemId);
@@ -477,7 +515,7 @@ const SearchResults = () => {
                         </div>
 
                         {/* View Details Button */}
-                        <button onClick={() => navigate(`/product/${item._id}`)} className="w-full bg-[#9d174d] text-white py-2 px-4 rounded-lg font-medium hover:bg-[#7f1d1d] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#9d174d] focus:ring-offset-2">
+                        <button onClick={() => navigate(`/product/${item._id}`)} className="text-sm sm:text-base w-full bg-[#9d174d] text-white py-2 px-4 rounded-lg font-medium hover:bg-[#7f1d1d] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#9d174d] focus:ring-offset-2">
                           View Details
                         </button>
                       </div>

@@ -12,7 +12,7 @@ const ExploreCategories = () => {
   const categories = [
     {
       id: 1,
-      name: "Electronics",
+      name: "Electronics & Appliances",
       emoji: "📱",
       description: "Phones, Laptops, Gadgets",
       bgColor: "from-blue-400 to-blue-600",
@@ -28,7 +28,7 @@ const ExploreCategories = () => {
     },
     {
       id: 3,
-      name: "Sports & Books",
+      name: "Books, Sports & Hobbies",
       emoji: "⚽",
       description: "Sports Equipment, Books",
       bgColor: "from-green-400 to-green-600",

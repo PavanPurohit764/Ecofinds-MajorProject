@@ -22,8 +22,6 @@ const API_BASE_URL =
   "http://localhost:5001";
 
 const ProductCard = ({ product, onViewDetails }) => {
-  const [imageStatus, setImageStatus] = useState("pending"); // pending | loaded | failed
-  const [lastTestedSrc, setLastTestedSrc] = useState(null);
   const [imgSrc, setImgSrc] = useState(null);
 
   const { toggleWishlist, isInWishlist } = useWishlist();
@@ -183,12 +181,9 @@ const ProductCard = ({ product, onViewDetails }) => {
 
   // 2. Preload and set imgSrc accordingly
   useEffect(() => {
-    setImageStatus("pending");
     const srcToTest = primaryImage || fallbackPlaceholder;
-    setLastTestedSrc(srcToTest);
 
     if (!srcToTest) {
-      setImageStatus("failed");
       setImgSrc(fallbackPlaceholder);
       return;
     }
@@ -201,13 +196,11 @@ const ProductCard = ({ product, onViewDetails }) => {
 
     img.onload = () => {
       if (!mounted) return;
-      setImageStatus("loaded");
       setImgSrc(srcToTest);
     };
 
     img.onerror = () => {
       if (!mounted) return;
-      setImageStatus("failed");
       setImgSrc(fallbackPlaceholder);
     };
 
@@ -220,9 +213,6 @@ const ProductCard = ({ product, onViewDetails }) => {
     };
   }, [primaryImage, fallbackPlaceholder, product?.id, product?._id]);
 
-  useEffect(() => {
-    console.info("ProductCard render - product:", product);
-  }, [product]);
 
   const titleText =
     productTitle || title || product?.name || "Untitled product";
@@ -300,23 +290,6 @@ const ProductCard = ({ product, onViewDetails }) => {
           </div>
         )}
 
-        {/* STATUS BADGE */}
-        <div className="absolute top-3 left-3 flex flex-col gap-2 z-20">
-          <span
-            className={`text-xs font-semibold px-2 py-1 rounded-full ${imageStatus === "loaded"
-              ? "bg-green-600 text-white"
-              : imageStatus === "pending"
-                ? "bg-yellow-500 text-white"
-                : "bg-red-600 text-white"
-              }`}
-          >
-            {imageStatus === "loaded"
-              ? "Image OK"
-              : imageStatus === "pending"
-                ? "Loading..."
-                : "Image Failed"}
-          </span>
-        </div>
 
         {/* ACTIONS (TOP RIGHT) */}
         <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
@@ -356,25 +329,6 @@ const ProductCard = ({ product, onViewDetails }) => {
           </div>
         )}
 
-        {/* DEBUG OVERLAY */}
-        <div className="absolute bottom-3 right-3 z-20 text-xs text-white/90">
-          <div className="bg-black/50 px-2 py-1 rounded-md">
-            <div className="flex items-center gap-2">
-              <a
-                href={lastTestedSrc || "#"}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline text-white text-[11px] max-w-[160px] truncate block"
-                title={lastTestedSrc}
-              >
-                Open image
-              </a>
-              <span className="text-[10px] text-gray-200/90">
-                {imageStatus}
-              </span>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* CONTENT */}

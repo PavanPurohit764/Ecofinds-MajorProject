@@ -581,7 +581,7 @@ const ProductDetailPage = () => {
                   </button>
                 </div>
 
-                <div className="flex gap-3">
+                <div className="flex flex-col sm:flex-row gap-3">
                   <button
                     disabled={product.quantity === 0 || addingToCart}
                     onClick={handleAddToCart}
@@ -606,7 +606,7 @@ const ProductDetailPage = () => {
                   <button
                     onClick={handleToggleWishlist}
                     disabled={isWishlistUpdating}
-                    className="px-4 py-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors duration-200"
+                    className="px-4 py-3 sm:py-0 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors duration-200 flex items-center justify-center h-[56px] sm:h-auto"
                   >
                     <HeartIcon
                       className={`h-6 w-6 ${

@@ -44,7 +44,7 @@ const DashboardLayout = () => {
         {/* Sidebar gets real user from auth */}
         <DashboardSidebar user={user} onLogout={handleLogout} />
 
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-auto pb-20 lg:pb-0">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
             {/* Dashboard routes */}
             <Routes>

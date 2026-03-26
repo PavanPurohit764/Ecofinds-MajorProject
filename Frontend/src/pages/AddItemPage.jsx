@@ -924,12 +924,31 @@ const AddItemPage = () => {
       {/* Progress Steps */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
+
+          {/* Mobile: compact progress */}
+          <div className="flex sm:hidden items-center gap-3">
+            <div className="flex-1 bg-gray-200 rounded-full h-1.5">
+              <div
+                className="bg-[#782355] h-1.5 rounded-full transition-all duration-300"
+                style={{ width: `${(currentStep / 4) * 100}%` }}
+              />
+            </div>
+            <span className="text-sm font-medium text-[#782355] whitespace-nowrap">
+              Step {currentStep} of 4 &ndash;{' '}
+              {currentStep === 1 && 'Basic Info'}
+              {currentStep === 2 && 'Details'}
+              {currentStep === 3 && 'Images & Location'}
+              {currentStep === 4 && 'Contact & Review'}
+            </span>
+          </div>
+
+          {/* Desktop: full step dots */}
+          <div className="hidden sm:flex items-center justify-between">
             {[1, 2, 3, 4].map((step) => (
               <div key={step} className="flex items-center">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                  step <= currentStep 
-                    ? 'bg-[#782355] text-white' 
+                  step <= currentStep
+                    ? 'bg-[#782355] text-white'
                     : 'bg-gray-200 text-gray-600'
                 }`}>
                   {step}
