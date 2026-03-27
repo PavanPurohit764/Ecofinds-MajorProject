@@ -50,7 +50,11 @@ const refreshToken = asynchandler(async (req, res) => {
         const { accessToken, refreshToken: newRefreshToken } = await generateAccessTokenAndRefreshToken(user._id);
 
         // Set new cookies
-        const options = { httpOnly: true, secure: true };
+        const options = { 
+            httpOnly: true, 
+            secure: process.env.NODE_ENV === "production",
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax"
+        };
 
         return res.status(200)
             .cookie('refreshToken', newRefreshToken, options)

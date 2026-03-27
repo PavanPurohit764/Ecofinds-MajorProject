@@ -40,7 +40,11 @@ const adminLogin = asynchandler(async (req, res) => {
 
     const accessToken = admin.generateAccessToken();
 
-    const options = { httpOnly: true, secure: process.env.NODE_ENV === "production" };
+    const options = { 
+        httpOnly: true, 
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax"
+    };
 
     return res
         .status(200)
@@ -55,7 +59,11 @@ const adminLogin = asynchandler(async (req, res) => {
 });
 
 const adminLogout = asynchandler(async (req, res) => {
-    const options = { httpOnly: true, secure: process.env.NODE_ENV === "production" };
+    const options = { 
+        httpOnly: true, 
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax"
+    };
     return res
         .status(200)
         .clearCookie("adminAccessToken", options)
