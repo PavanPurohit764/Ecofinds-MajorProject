@@ -6,10 +6,10 @@ const createTransporter = () => {
   const pass = (process.env.EMAIL_PASS || "").trim();
 
   const config = {
-    // service: "gmail", // Using explicit host/port for more control
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true, // Use SSL/TLS for port 465
+    service: "gmail",
+    // host: "smtp.gmail.com",
+    // port: 465,
+    // secure: true,
     auth: {
       user: user,
       pass: pass,
@@ -17,9 +17,13 @@ const createTransporter = () => {
     tls: {
       rejectUnauthorized: false,
     },
+    // Adding shorter timeouts to fail fast and debug
+    connectionTimeout: 15000, // 15s
+    greetingTimeout: 15000,    // 15s
+    socketTimeout: 30000,      // 30s
   };
 
-  console.log(`[EMAIL] Creating transporter with config. Auth user: ${user}`);
+  console.log(`[EMAIL] Creating transporter with Gmail service. Auth user: ${user}`);
   const transporter = nodemailer.createTransport(config);
   return transporter;
 };
