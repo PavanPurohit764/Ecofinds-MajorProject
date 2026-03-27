@@ -6,24 +6,19 @@ const createTransporter = () => {
   const pass = (process.env.EMAIL_PASS || "").trim();
 
   const config = {
-    service: "gmail",
-    // host: "smtp.gmail.com",
-    // port: 465,
-    // secure: true,
+    host: "smtp-relay.brevo.com",
+    port: 587,
+    secure: false, // true for 465, false for other ports
     auth: {
       user: user,
       pass: pass,
     },
-    tls: {
-      rejectUnauthorized: false,
-    },
-    // Adding shorter timeouts to fail fast and debug
+    // Optional: Add custom timeouts for better production resilience
     connectionTimeout: 15000, // 15s
-    greetingTimeout: 15000,    // 15s
     socketTimeout: 30000,      // 30s
   };
 
-  console.log(`[EMAIL] Creating transporter with Gmail service. Auth user: ${user}`);
+  console.log(`[EMAIL] Creating transporter with Brevo relay. User: ${user}`);
   const transporter = nodemailer.createTransport(config);
   return transporter;
 };
