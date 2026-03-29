@@ -191,8 +191,8 @@ const ChatPage = () => {
                                         >
                                             <div className="flex items-center space-x-3">
                                                 <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden">
-                                                    {partner?.profileImage ? (
-                                                        <img src={partner.profileImage} alt={partner.name} className="w-full h-full object-cover" />
+                                                    {(partner?.profileImage || partner?.avatar) ? (
+                                                        <img src={partner.profileImage || partner.avatar} alt={partner.name} className="w-full h-full object-cover" />
                                                     ) : (
                                                         <FiUser className="h-6 w-6 text-gray-500" />
                                                     )}
@@ -243,8 +243,8 @@ const ChatPage = () => {
                                     return (
                                         <>
                                             <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden">
-                                                {partner?.profileImage ? (
-                                                    <img src={partner.profileImage} alt={partner.name} className="w-full h-full object-cover" />
+                                                {(partner?.profileImage || partner?.avatar) ? (
+                                                    <img src={partner.profileImage || partner.avatar} alt={partner.name} className="w-full h-full object-cover" />
                                                 ) : (
                                                     <FiUser className="h-5 w-5 text-gray-500" />
                                                 )}
@@ -474,7 +474,7 @@ const ChatPage = () => {
                                     {activeChat.users.map(u => (
                                         <div key={u._id} className="flex items-center space-x-2 text-sm">
                                             <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-                                                {u.profileImage ? <img src={u.profileImage} alt={u.name} className="w-full h-full object-cover" /> : <FiUser size={14} />}
+                                                {(u.profileImage || u.avatar) ? <img src={u.profileImage || u.avatar} alt={u.name} className="w-full h-full object-cover" /> : <FiUser size={14} />}
                                             </div>
                                             <span className="flex-1 truncate">{u.name} {u._id === user._id && '(You)'}</span>
                                             {activeChat.groupAdmin?._id === user._id && u._id !== user._id && (
