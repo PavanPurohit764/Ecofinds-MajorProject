@@ -7,6 +7,7 @@ const {
   debugCheckUser,
   fixCorruptedUsername,
   resetUserPassword,
+  searchUsers,
 } = require("../controllers/user.controller");
 const upload = require("../middlewares/multer.middleware");
 const { loginUser, logoutUser } = require("../controllers/login.controller");
@@ -78,6 +79,9 @@ router.post("/fix-username", fixCorruptedUsername); // Fix corrupted username en
 
 // Reset password route
 router.post("/reset-password", resetUserPassword); // Reset password for corrupted users
+
+// Search users for chat
+router.get("/search", verifyJWT, searchUsers);
 
 // router.post("/signup", signup);
 // router.route('/register').post(registerUser);    // Route to register a user (used chaining method syntax)

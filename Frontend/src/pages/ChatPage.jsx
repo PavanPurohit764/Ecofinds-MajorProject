@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { useChat } from '../context/ChatContext';
 import { useAuth } from '../context/AuthContext';
 import { FiSend, FiUser, FiInfo, FiPlus, FiSettings, FiLogOut, FiEdit2 } from 'react-icons/fi'; // Assumed icon library already used
-import axios from 'axios'; // For user search if needed, or use a service
+import apiClient from '../api/axios';
 
 const ChatPage = () => {
     const { user } = useAuth();
@@ -68,11 +68,9 @@ const ChatPage = () => {
     const handleSearch = async (query) => {
         setLoadingSearch(true);
         try {
-            // Adjust search endpoint if necessary. Standard user search
-            const { data } = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/users/search?q=${query}`, {
-                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-            });
-            setSearchResults(data.users || []);
+            const { data } = await apiClient.get(`/users/search?q=${query}`);
+            // Success response format: { success: true, message: "...", data: { users: [...] } }
+            setSearchResults(data.data?.users || []);
         } catch (error) {
             console.error('Search failed:', error);
         } finally {
@@ -97,6 +95,16 @@ const ChatPage = () => {
             setSelectedUsers(selectedUsers.filter(u => u._id !== userToAdd._id));
         } else {
             setSelectedUsers([...selectedUsers, userToAdd]);
+        }
+    };
+
+    const handleStartIndividualChat = async (userId) => {
+        const chat = await accessChat(userId);
+        if (chat) {
+            setActiveChat(chat);
+            setShowGroupModal(false);
+            setSearchQuery('');
+            setSearchResults([]);
         }
     };
 
@@ -353,16 +361,21 @@ const ChatPage = () => {
                                     {searchResults.map(u => (
                                         <div
                                             key={u._id}
-                                            onClick={() => handleToggleUserSelection(u)}
-                                            className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg cursor-pointer"
+                                            className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg group"
                                         >
-                                            <div className="flex items-center space-x-2">
+                                            <div className="flex items-center space-x-2 flex-1 cursor-pointer" onClick={() => handleStartIndividualChat(u._id)}>
                                                 <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-                                                    {u.profileImage ? <img src={u.profileImage} alt={u.name} className="w-full h-full object-cover" /> : <FiUser size={14} />}
+                                                    {u.avatar || u.profileImage ? <img src={u.avatar || u.profileImage} alt={u.name} className="w-full h-full object-cover" /> : <FiUser size={14} />}
                                                 </div>
-                                                <span className="text-sm font-medium">{u.name}</span>
+                                                <div>
+                                                    <div className="text-sm font-medium">{u.name}</div>
+                                                    <div className="text-[10px] text-gray-500">@{u.username}</div>
+                                                </div>
                                             </div>
-                                            <div className={`w-5 h-5 rounded-full border flex items-center justify-center ${selectedUsers.find(sel => sel._id === u._id) ? 'bg-green-500 border-green-500 text-white' : 'border-gray-300'}`}>
+                                            <div 
+                                                onClick={() => handleToggleUserSelection(u)}
+                                                className={`w-5 h-5 rounded-full border flex items-center justify-center cursor-pointer ${selectedUsers.find(sel => sel._id === u._id) ? 'bg-green-500 border-green-500 text-white' : 'border-gray-300'}`}
+                                            >
                                                 {selectedUsers.find(sel => sel._id === u._id) && <span>&check;</span>}
                                             </div>
                                         </div>

@@ -492,6 +492,26 @@ const debugCheckUser = asynchandler(async (req, res) => {
   }
 });
 
+// Search for users by name or username
+const searchUsers = asynchandler(async (req, res) => {
+  const keyword = req.query.q
+    ? {
+        $or: [
+          { name: { $regex: req.query.q, $options: "i" } },
+          { username: { $regex: req.query.q, $options: "i" } },
+        ],
+      }
+    : {};
+
+  const users = await User.find(keyword)
+    .find({ _id: { $ne: req.user._id } })
+    .select("name username email profileImage avatar");
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, "Users retrieved successfully", { users }));
+});
+
 module.exports = {
   registerUser,
   sendEmailVerificationOTP,
@@ -500,4 +520,5 @@ module.exports = {
   debugCheckUser,
   fixCorruptedUsername,
   resetUserPassword,
+  searchUsers,
 };
