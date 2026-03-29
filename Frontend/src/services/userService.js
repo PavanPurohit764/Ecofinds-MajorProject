@@ -159,9 +159,9 @@ export const userService = {
   uploadProfilePicture: async (file) => {
     try {
       const formData = new FormData();
-      formData.append('profilePicture', file);
+      formData.append('avatar', file);
       
-      const response = await apiClient.post('/user-profile/upload/profile', formData, {
+      const response = await apiClient.patch('/users/change-avatar', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

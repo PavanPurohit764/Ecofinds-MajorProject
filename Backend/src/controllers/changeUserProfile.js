@@ -108,7 +108,10 @@ const changeAvatar = asynchandler(async (req, res) => {
 
   const user = await UserSchema.findByIdAndUpdate(
     req.user._id,
-    { avatar: avatar.url },
+    { 
+      avatar: avatar.url,
+      profileImage: avatar.url 
+    },
     { new: true }
   );
 

@@ -30,6 +30,7 @@ const MyProfile = () => {
   });
 
   const [editData, setEditData] = useState(profileData);
+  const [selectedFile, setSelectedFile] = useState(null);
 
   const [statsData, setStatsData] = useState([
     {
@@ -175,11 +176,17 @@ const MyProfile = () => {
         updateData.address = address;
       }
 
-      // Call backend
+      // 1. Upload new image if selected
+      if (selectedFile) {
+        await userService.uploadProfilePicture(selectedFile);
+      }
+
+      // 2. Call backend for other details
       const response = await userService.updateAccountDetails(updateData);
 
       if (response.success) {
         setProfileData(editData);
+        setSelectedFile(null);
         setIsEditing(false);
         alert("Profile updated successfully!");
       } else {
@@ -195,12 +202,14 @@ const MyProfile = () => {
 
   const handleCancel = () => {
     setEditData(profileData);
+    setSelectedFile(null);
     setIsEditing(false);
   };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      setSelectedFile(file);
       const reader = new FileReader();
       reader.onload = (e) => {
         setEditData({ ...editData, profileImage: e.target.result });
