@@ -17,7 +17,6 @@ const {
     getUserNegotiations
 } = require('../controllers/userProfile.controller');
 const auth = require('../middlewares/auth.middleware');
-const upload = require('../middlewares/multer.middleware');
 
 // All routes require authentication
 router.use(auth);
@@ -28,8 +27,8 @@ router.put('/update', updateUserProfile);                       // Update user p
 router.get('/connections', getConnections);                     // Get user connections list
 router.post('/connections/request/:userId', sendConnectionRequest); // Send connection request
 router.put('/connections/respond/:requestId', respondToConnectionRequest); // Accept/reject connection request
-router.post('/upload/profile', upload.single('profilePicture'), uploadProfilePicture); // Upload profile picture
-router.post('/upload/cover', upload.single('coverImage'), uploadCoverImage); // Upload cover image
+router.post('/upload/profile', uploadProfilePicture); // Upload profile picture
+router.post('/upload/cover', uploadCoverImage); // Upload cover image
 router.get('/suggestions/connections', getConnectionSuggestions); // Get connection suggestions
 router.get('/orders', getUserOrderHistory);                     // Get user's order history with enhanced details
 router.get('/reviews', getUserReviewSections);                  // Get user's review sections (samples and orders)

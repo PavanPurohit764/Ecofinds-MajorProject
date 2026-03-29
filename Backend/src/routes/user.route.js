@@ -54,15 +54,13 @@ router.patch("/update-account", verifyJWT, updateAccountDetails); // Route to up
 router.patch(
   "/change-avatar",
   verifyJWT,
-  upload.single("avatar"),
   changeAvatar
-); // Route to change the avatar using multer
+); // Route to change the avatar
 router.patch(
   "/change-cover-images",
   verifyJWT,
-  upload.array("cover images", 5),
   changeCoverImages
-); // Route to change the cover images using multer
+); // Route to change the cover images
 // router.get('/watch-history', verifyJWT, getWatchhistory);    // Route to get the watch history - TODO: Implement this function
 // router.get('/profile/:username',verifyJWT, AddProfileDetails);    // Route to get profile details - TODO: Implement this function
 

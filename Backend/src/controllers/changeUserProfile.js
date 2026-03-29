@@ -92,17 +92,18 @@ const updateAccountDetails = asynchandler(async (req, res) => {
 });
 
 const changeAvatar = asynchandler(async (req, res) => {
-  // Multer puts single files in req.file, while express-fileupload uses req.files
-  const avatarLocalPath = req.file?.path;
+  // express-fileupload puts files in req.files
+  const avatarFile = req.files?.avatar;
 
   console.log("[UPLOAD] Incoming avatar upload request");
-  console.log("[UPLOAD] File info:", req.file);
+  console.log("[UPLOAD] File info:", avatarFile ? "File received" : "No file");
 
-  if (!avatarLocalPath) {
-    console.error("[UPLOAD] No file path found in request. req.file:", req.file);
+  if (!avatarFile) {
+    console.error("[UPLOAD] No avatar file found in request. req.files:", req.files);
     throw new apiError(400, "Please provide an avatar file");
   }
 
+  const avatarLocalPath = avatarFile.tempFilePath;
   const avatar = await uploadOnCloudinary(avatarLocalPath);
 
   if (!avatar) {
@@ -124,13 +125,19 @@ const changeAvatar = asynchandler(async (req, res) => {
 });
 
 const changeCoverImages = asynchandler(async (req, res) => {
-  const coverImagesLocalPaths = req.files["cover images"]?.map(
-    (file) => file.tempFilePath
-  );
+  // express-fileupload puts multiple files as an array or single object in req.files
+  let coverFiles = req.files?.["cover images"];
 
-  if (!coverImagesLocalPaths) {
+  if (!coverFiles) {
     throw new apiError(400, "Please provide cover images");
   }
+
+  // Ensure coverFiles is an array even if only one file is uploaded
+  if (!Array.isArray(coverFiles)) {
+    coverFiles = [coverFiles];
+  }
+
+  const coverImagesLocalPaths = coverFiles.map((file) => file.tempFilePath);
 
   const coverImages = await Promise.all(
     coverImagesLocalPaths.map(async (coverImageLocalPath) => {
