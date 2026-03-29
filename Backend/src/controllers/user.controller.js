@@ -112,7 +112,7 @@ const sendEmailVerificationOTP = asynchandler(async (req, res) => {
       return res
         .status(200)
         .json(
-          new ApiResponse(200, "OTP sent successfully to your email", { email })
+          new ApiResponse(200, { email }, "OTP sent successfully to your email")
         );
     } catch (error) {
       console.error("[AUTH] Error in sendEmailVerificationOTP:", error);
@@ -226,12 +226,12 @@ const verifyEmailOTP = asynchandler(async (req, res) => {
       .json(
         new ApiResponse(
           201,
-          "Email verified and registration completed successfully!",
           {
             user: createdUser,
             accessToken,
             refreshToken,
-          }
+          },
+          "Email verified and registration completed successfully!"
         )
       );
   } catch (error) {
@@ -292,12 +292,12 @@ const verifyEmailOTP = asynchandler(async (req, res) => {
           .json(
             new ApiResponse(
               201,
-              "Email verified and registration completed successfully after cleanup!",
               {
                 user: createdUser,
                 accessToken,
                 refreshToken,
-              }
+              },
+              "Email verified and registration completed successfully after cleanup!"
             )
           );
       } catch (retryError) {
@@ -354,7 +354,7 @@ const resendEmailVerificationOTP = asynchandler(async (req, res) => {
 
     return res
       .status(200)
-      .json(new ApiResponse(200, "New OTP sent successfully", { email }));
+      .json(new ApiResponse(200, { email }, "New OTP sent successfully"));
   } catch (error) {
     throw new apiError(500, "Failed to resend verification email");
   }
@@ -399,11 +399,11 @@ const fixCorruptedUsername = asynchandler(async (req, res) => {
     console.log("Username successfully updated to:", newUsername.toLowerCase());
 
     return res.status(200).json(
-      new ApiResponse(200, "Username fixed successfully", {
+      new ApiResponse(200, {
         oldUsername: user.username,
         newUsername: newUsername.toLowerCase(),
         email: user.email,
-      })
+      }, "Username fixed successfully")
     );
   } catch (error) {
     console.error("Error fixing username:", error);
@@ -440,10 +440,10 @@ const resetUserPassword = asynchandler(async (req, res) => {
     console.log("Password successfully reset for user:", user.email);
 
     return res.status(200).json(
-      new ApiResponse(200, "Password reset successfully", {
+      new ApiResponse(200, {
         email: user.email,
         username: user.username,
-      })
+      }, "Password reset successfully")
     );
   } catch (error) {
     console.error("Error resetting password:", error);
@@ -494,22 +494,31 @@ const debugCheckUser = asynchandler(async (req, res) => {
 
 // Search for users by name or username
 const searchUsers = asynchandler(async (req, res) => {
-  const keyword = req.query.q
+  const queryParam = req.query.q || "";
+  console.log(`[SEARCH] Searching for users with query: "${queryParam}" (Current User: ${req.user.username})`);
+
+  const keyword = queryParam
     ? {
         $or: [
-          { name: { $regex: req.query.q, $options: "i" } },
-          { username: { $regex: req.query.q, $options: "i" } },
+          { name: { $regex: queryParam, $options: "i" } },
+          { username: { $regex: queryParam, $options: "i" } },
         ],
       }
     : {};
 
-  const users = await User.find(keyword)
-    .find({ _id: { $ne: req.user._id } })
-    .select("name username email profileImage avatar");
+  const users = await User.find({
+    ...keyword,
+    _id: { $ne: req.user._id },
+    isEmailVerified: true // Only return verified users
+  })
+    .select("name username email profileImage avatar")
+    .limit(10); // Limit to top 10 results for better performance
+
+  console.log(`[SEARCH] Found ${users.length} users matching query: "${queryParam}"`);
 
   return res
     .status(200)
-    .json(new ApiResponse(200, "Users retrieved successfully", { users }));
+    .json(new ApiResponse(200, { users }, "Users retrieved successfully"));
 });
 
 module.exports = {

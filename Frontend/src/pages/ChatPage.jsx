@@ -33,6 +33,7 @@ const ChatPage = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [loadingSearch, setLoadingSearch] = useState(false);
+    const [searchError, setSearchError] = useState(null);
 
     // Group Settings states
     const [showSettingsModal, setShowSettingsModal] = useState(false);
@@ -67,12 +68,22 @@ const ChatPage = () => {
 
     const handleSearch = async (query) => {
         setLoadingSearch(true);
+        setSearchError(null);
         try {
+            console.log(`[FRONTEND] Searching for: ${query}`);
             const { data } = await apiClient.get(`/users/search?q=${query}`);
+            console.log('[FRONTEND] Search Response:', data);
+            
             // Success response format: { success: true, message: "...", data: { users: [...] } }
-            setSearchResults(data.data?.users || []);
+            const usersFound = data.data?.users || [];
+            setSearchResults(usersFound);
+            
+            if (usersFound.length === 0) {
+                console.warn(`[FRONTEND] No users found for query: ${query}`);
+            }
         } catch (error) {
             console.error('Search failed:', error);
+            setSearchError(error.response?.data?.message || 'Failed to search users. Please try again.');
         } finally {
             setLoadingSearch(false);
         }
@@ -358,6 +369,25 @@ const ChatPage = () => {
                                 {loadingSearch && <div className="mt-2 text-xs text-gray-500 italic">Searching...</div>}
 
                                 <div className="mt-2 max-h-40 overflow-y-auto space-y-1">
+                                    {loadingSearch && (
+                                        <div className="flex items-center justify-center py-4 text-xs text-gray-500 italic">
+                                            <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-green-600 mr-2"></div>
+                                            Searching...
+                                        </div>
+                                    )}
+                                    
+                                    {searchError && (
+                                        <div className="text-center py-2 text-xs text-red-500 bg-red-50 rounded-lg">
+                                            {searchError}
+                                        </div>
+                                    )}
+
+                                    {!loadingSearch && !searchError && searchQuery.trim().length > 1 && searchResults.length === 0 && (
+                                        <div className="text-center py-4 text-xs text-gray-500 italic">
+                                            No users found for "{searchQuery}"
+                                        </div>
+                                    )}
+
                                     {searchResults.map(u => (
                                         <div
                                             key={u._id}
