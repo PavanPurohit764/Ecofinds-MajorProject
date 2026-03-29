@@ -161,11 +161,7 @@ export const userService = {
       const formData = new FormData();
       formData.append('avatar', file);
       
-      const response = await apiClient.patch('/users/change-avatar', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      const response = await apiClient.patch('/users/change-avatar', formData);
       return response.data;
     } catch (error) {
       console.error('Error uploading profile picture:', error);

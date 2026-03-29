@@ -92,12 +92,15 @@ const updateAccountDetails = asynchandler(async (req, res) => {
 });
 
 const changeAvatar = asynchandler(async (req, res) => {
-  const avatarLocalPath = req.files?.avatar
-    ? req.files.avatar.tempFilePath
-    : null;
+  // Multer puts single files in req.file, while express-fileupload uses req.files
+  const avatarLocalPath = req.file?.path;
+
+  console.log("[UPLOAD] Incoming avatar upload request");
+  console.log("[UPLOAD] File info:", req.file);
 
   if (!avatarLocalPath) {
-    throw new apiError(400, "Please provide an avatar");
+    console.error("[UPLOAD] No file path found in request. req.file:", req.file);
+    throw new apiError(400, "Please provide an avatar file");
   }
 
   const avatar = await uploadOnCloudinary(avatarLocalPath);
