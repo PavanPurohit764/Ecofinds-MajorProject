@@ -283,6 +283,7 @@ const SearchResults = () => {
             fixed lg:static inset-0 z-40 lg:z-auto 
             ${isFilterOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none lg:opacity-100 lg:pointer-events-auto'}
             transition-all duration-300
+            lg:w-72 w-full
           `}>
             {/* Mobile Backdrop */}
             <div 
@@ -291,24 +292,24 @@ const SearchResults = () => {
             />
             
             <div className={`
-              absolute left-0 top-0 h-full w-[300px] bg-white lg:bg-transparent shadow-2xl lg:shadow-none 
-              transform transition-transform duration-300 ease-out lg:transform-none lg:w-72
+              absolute lg:relative left-0 top-0 h-full lg:h-auto w-[300px] lg:w-full bg-white lg:bg-transparent shadow-2xl lg:shadow-none 
+              transform transition-transform duration-300 ease-out lg:transform-none
               ${isFilterOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-              flex flex-col lg:block
+              flex flex-col lg:block bg-white lg:rounded-3xl lg:border lg:border-gray-100 lg:shadow-sm overflow-hidden
             `}>
-              <div className="p-6 lg:p-0 flex flex-col h-full">
-                <div className="flex items-center justify-between mb-8 lg:mb-6 px-1">
-                  <h3 className="text-xl font-extrabold text-gray-900 tracking-tight flex items-center gap-2.5">
-                    <FunnelIcon className="h-5 w-5 text-[#9d174d]" />
-                    Filter By
+              <div className="p-7">
+                <div className="flex items-center justify-between mb-8">
+                  <h3 className="text-lg font-bold text-gray-900 flex items-center">
+                    <FunnelIcon className="w-5 h-5 mr-2.5 text-[#9d174d]" />
+                    Filters
                   </h3>
                   <div className="flex items-center gap-2">
                     <button
                       onClick={clearAllFilters}
-                      className="text-[10px] font-black uppercase tracking-[0.1em] text-[#9d174d] hover:text-[#7f1d1d] disabled:opacity-30 p-1"
+                      className="text-xs font-bold uppercase tracking-wider text-[#9d174d] hover:text-[#7f1d1d] disabled:opacity-30"
                       disabled={filters.condition === 'all' && !filters.minPrice && !filters.maxPrice && !filters.location}
                     >
-                      Clear
+                      Clear All
                     </button>
                     <button className="lg:hidden p-1 text-gray-400" onClick={() => setIsFilterOpen(false)}>
                       <XMarkIcon className="h-6 w-6" />
@@ -316,86 +317,86 @@ const SearchResults = () => {
                   </div>
                 </div>
 
-                <div className="bg-white/40 lg:bg-white lg:rounded-3xl lg:border lg:border-gray-100 lg:shadow-[0_8px_30px_rgb(0,0,0,0.02)] overflow-hidden">
-                  <div className="p-6 space-y-9">
-                    {/* Condition Section */}
-                    <section>
-                      <h4 className="text-[11px] font-black uppercase tracking-[0.15em] text-gray-400 mb-5">Condition</h4>
-                      <div className="grid grid-cols-2 gap-2">
-                        {['all', 'new', 'like new', 'good', 'fair', 'used'].map((condition) => (
-                          <button
-                            key={condition}
-                            onClick={() => handleFilterChange('condition', condition)}
-                            className={`px-3 py-2 text-xs font-bold rounded-xl border transition-all duration-200 capitalize ${
-                              filters.condition === condition 
-                                ? 'bg-[#9d174d] text-white border-[#9d174d] shadow-md shadow-[#9d174d]/20' 
-                                : 'bg-white text-gray-600 border-gray-100 hover:border-gray-300'
-                            }`}
-                          >
-                            {condition}
-                          </button>
-                        ))}
-                      </div>
-                    </section>
-
-                    {/* Price Range Section */}
-                    <section>
-                      <h4 className="text-[11px] font-black uppercase tracking-[0.15em] text-gray-400 mb-5">Budget</h4>
-                      <div className="space-y-4">
-                        <div className="flex items-center gap-3">
-                          <div className="relative flex-1">
-                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs text-bold">₹</span>
-                            <input
-                              type="number"
-                              placeholder="Min"
-                              value={filters.minPrice}
-                              onChange={(e) => handleFilterChange('minPrice', e.target.value)}
-                              className="w-full pl-7 pr-3 py-2.5 bg-gray-50 border-none rounded-xl text-sm font-bold text-gray-700 placeholder:text-gray-300 focus:ring-2 focus:ring-[#9d174d]/10 transition-all"
-                            />
-                          </div>
-                          <div className="w-2 h-0.5 bg-gray-200 rounded-full"></div>
-                          <div className="relative flex-1">
-                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs text-bold">₹</span>
-                            <input
-                              type="number"
-                              placeholder="Max"
-                              value={filters.maxPrice}
-                              onChange={(e) => handleFilterChange('maxPrice', e.target.value)}
-                              className="w-full pl-7 pr-3 py-2.5 bg-gray-50 border-none rounded-xl text-sm font-bold text-gray-700 placeholder:text-gray-300 focus:ring-2 focus:ring-[#9d174d]/10 transition-all"
-                            />
-                          </div>
-                        </div>
-                        <div className="flex justify-between px-1">
-                          <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">
-                            Range: ₹{filters.minPrice || '0'} - ₹{filters.maxPrice || '∞'}
-                          </span>
-                        </div>
-                      </div>
-                    </section>
-
-                    {/* Location Section */}
-                    <section>
-                      <h4 className="text-[11px] font-black uppercase tracking-[0.15em] text-gray-400 mb-5">Location</h4>
-                      <div className="relative">
+                {/* Condition Filter */}
+                <div className="mb-8">
+                  <h4 className="text-[11px] font-black uppercase tracking-[0.2em] text-gray-400 mb-4">Condition</h4>
+                  <div className="space-y-3">
+                    {['all', 'new', 'like new', 'good', 'fair', 'used'].map((condition) => (
+                      <label key={condition} className="flex items-center cursor-pointer group">
                         <input
-                          type="text"
-                          placeholder="Search area..."
-                          value={filters.location}
-                          onChange={(e) => handleFilterChange('location', e.target.value)}
-                          className="w-full pl-4 pr-10 py-2.5 bg-gray-50 border-none rounded-xl text-sm font-bold text-gray-700 placeholder:text-gray-300 focus:ring-2 focus:ring-[#9d174d]/10 transition-all"
+                          type="radio"
+                          name="condition"
+                          value={condition}
+                          checked={filters.condition === condition}
+                          onChange={(e) => handleFilterChange('condition', e.target.value)}
+                          className="w-4 h-4 text-[#9d174d] border-gray-300 focus:ring-[#9d174d]"
                         />
-                        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300">
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                          </svg>
-                        </div>
-                      </div>
-                    </section>
+                        <span className="ml-3 text-sm font-semibold text-gray-600 capitalize group-hover:text-gray-900 transition-colors">
+                          {condition === 'all' ? 'Any Condition' : condition}
+                        </span>
+                      </label>
+                    ))}
                   </div>
-                  
-                  <div className="bg-gray-50/50 p-6 border-t border-gray-100 mt-4">
-                    <p className="text-[10px] text-gray-400 font-black uppercase tracking-[0.15em] mb-1">Impact</p>
-                    <p className="text-sm font-extrabold text-gray-900">Saving {filteredResults.length} items from landfill</p>
+                </div>
+
+                {/* Price Range Filter */}
+                <div className="mb-8">
+                  <h4 className="text-[11px] font-black uppercase tracking-[0.2em] text-gray-400 mb-4">Price Range</h4>
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-2">
+                      <div className="relative flex-1">
+                        <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-300 text-[10px] font-bold">₹</span>
+                        <input
+                          type="number"
+                          placeholder="Min"
+                          value={filters.minPrice}
+                          onChange={(e) => handleFilterChange('minPrice', e.target.value)}
+                          className="w-full pl-6 pr-2 py-2.5 bg-gray-50 border-none rounded-xl text-xs font-bold text-gray-700 placeholder:text-gray-300 focus:ring-2 focus:ring-[#9d174d]/10 transition-all"
+                        />
+                      </div>
+                      <span className="text-gray-300 text-[10px] font-black uppercase">to</span>
+                      <div className="relative flex-1">
+                        <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-300 text-[10px] font-bold">₹</span>
+                        <input
+                          type="number"
+                          placeholder="Max"
+                          value={filters.maxPrice}
+                          onChange={(e) => handleFilterChange('maxPrice', e.target.value)}
+                          className="w-full pl-6 pr-2 py-2.5 bg-gray-50 border-none rounded-xl text-xs font-bold text-gray-700 placeholder:text-gray-300 focus:ring-2 focus:ring-[#9d174d]/10 transition-all"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Location Filter */}
+                <div className="mb-8">
+                  <h4 className="text-[11px] font-black uppercase tracking-[0.2em] text-gray-400 mb-4">Location</h4>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="Enter city or area..."
+                      value={filters.location}
+                      onChange={(e) => handleFilterChange('location', e.target.value)}
+                      className="w-full pl-4 pr-10 py-2.5 bg-gray-50 border-none rounded-xl text-xs font-bold text-gray-700 placeholder:text-gray-300 focus:ring-2 focus:ring-[#9d174d]/10 transition-all"
+                    />
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300">
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Summary Section */}
+                <div className="pt-6 border-t border-gray-100 mt-2">
+                  <div className="flex justify-between items-center mb-1.5">
+                    <span className="text-[10px] font-black uppercase tracking-[0.15em] text-gray-400">Products</span>
+                    <span className="text-xs font-black text-gray-900">{allResults.length} Found</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] font-black uppercase tracking-[0.15em] text-gray-400">Showing</span>
+                    <span className="text-xs font-black text-[#9d174d]">{filteredResults.length} Filtered</span>
                   </div>
                 </div>
               </div>
