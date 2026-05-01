@@ -37,7 +37,15 @@ export default function AuthPage() {
 
   return (
     <div>
-      { isAuthenticated === false ? (
+      <SuccessMessage
+        show={successMessage.show}
+        type={successMessage.type}
+        title={successMessage.title}
+        message={successMessage.message}
+        onClose={hideSuccessMessage}
+      />
+
+      { isAuthenticated === false || successMessage.show ? (
       <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50">
         {/* Desktop Layout */}
         <div className="hidden md:flex justify-center items-center min-h-screen py-4">
@@ -62,14 +70,6 @@ export default function AuthPage() {
             <FeatureList />
           </div>
         </div>
-        {/* Success Message Modal */}
-        <SuccessMessage
-          show={successMessage.show}
-          type={successMessage.type}
-          title={successMessage.title}
-          message={successMessage.message}
-          onClose={hideSuccessMessage}
-        />
       </div>
       ) : (
         <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-orange-50 via-white to-orange-50">
