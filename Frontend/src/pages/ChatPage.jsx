@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useChat } from '../context/ChatContext';
 import { useAuth } from '../context/AuthContext';
-import { FiSend, FiUser, FiInfo, FiPlus, FiSettings, FiLogOut, FiEdit2 } from 'react-icons/fi'; // Assumed icon library already used
+import { FiSend, FiUser, FiInfo, FiPlus, FiSettings, FiLogOut, FiEdit2 } from 'react-icons/fi';
 import apiClient from '../api/axios';
+import Navbar from '../components/landing/Navbar';
 
 const ChatPage = () => {
     const { user } = useAuth();
@@ -24,6 +25,7 @@ const ChatPage = () => {
     } = useChat();
 
     const location = useLocation();
+    const navigate = useNavigate();
     const [messageInput, setMessageInput] = useState('');
 
     // Group UI states
@@ -151,7 +153,18 @@ const ChatPage = () => {
 
     return (
         <>
-            <div className="flex bg-gray-50 max-w-7xl mx-auto h-[calc(100vh-64px)] overflow-hidden rounded-lg shadow-sm border border-gray-200 mt-0 lg:mt-6 mb-6">
+            <Navbar />
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 hidden md:block">
+                <button
+                    onClick={() => navigate(-1)}
+                    className="flex items-center text-gray-600 hover:text-[#782355] transition-colors"
+                >
+                    <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
+                    <span className="text-sm font-medium">Back</span>
+                </button>
+            </div>
+            
+            <div className="flex bg-gray-50 max-w-7xl mx-auto h-[calc(100vh-140px)] overflow-hidden rounded-lg shadow-sm border border-gray-200 mt-2 lg:mt-4 mb-6">
 
                 {/* Sidebar: Chat List */}
                 <div className={`w-full md:w-1/3 bg-white border-r border-gray-200 flex flex-col ${activeChat ? 'hidden md:flex' : 'flex'}`}>
