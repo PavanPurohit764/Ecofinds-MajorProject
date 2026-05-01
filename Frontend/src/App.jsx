@@ -20,6 +20,7 @@ import LandingPage from "./pages/LandingPage";
 import SearchResults from "./pages/SearchResults";
 import ProductDetailPage from "./pages/ProductDetailPage";
 import CartPage from "./pages/CartPage";
+import CheckoutPage from "./pages/CheckoutPage";
 import AddItemPage from "./pages/AddItemPage";
 import DashboardLayout from "./pages/dashboard/DashboardLayout";
 import EnvironmentPage from "./pages/EnvironmentPage";
@@ -158,6 +159,14 @@ function App() {
                         />
                         <Route path="/search" element={<SearchResults />} />
                         <Route path="/cart" element={<CartPage />} />
+                        <Route
+                          path="/checkout"
+                          element={
+                            <ProtectedRoute>
+                              <CheckoutPage />
+                            </ProtectedRoute>
+                          }
+                        />
                         <Route
                           path="/environment"
                           element={<EnvironmentPage />}

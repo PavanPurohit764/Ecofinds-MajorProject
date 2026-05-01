@@ -19,10 +19,6 @@ import {
 } from "@heroicons/react/24/outline";
 import { useNavigate, useParams } from "react-router-dom";
 import productService from "../services/productService";
-import {
-  paymentService,
-  openRazorpayCheckout,
-} from "../services/paymentService";
 import { useRetry } from "../hooks/useUtils";
 import { useCart } from "../hooks/useCart";
 import { useWishlist } from "../context/WishlistContext";
@@ -102,104 +98,20 @@ const ProductDetailPage = () => {
     }
   };
 
-  const handleBuyNow = async () => {
+  const handleBuyNow = () => {
     if (product.quantity === 0) {
       alert("Product is out of stock");
       return;
     }
 
-    // Prevent double clicking
-    if (isProcessingPayment) {
-      console.log("Payment already in progress, ignoring click");
-      return;
-    }
-
-    setIsProcessingPayment(true);
-
-    try {
-      const totalAmount = product.price * selectedQuantity;
-
-      // Create order in backend
-      const orderData = {
-        items: [
-          {
-            productId: product._id,
-            quantity: selectedQuantity,
-            price: product.price,
-          },
-        ],
-        totalAmount: totalAmount,
-        currency: "INR",
-      };
-
-      const orderResponse = await paymentService.createOrder(orderData);
-
-      if (!orderResponse.success) {
-        throw new Error(orderResponse.message || "Failed to create order");
-      }
-
-      const { order } = orderResponse.data;
-
-      // Razorpay options
-      const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_U0JVBIF0p05ory",
-        amount: order.amount,
-        currency: order.currency,
-        name: "OdooXNMIT",
-        description: `Purchase: ${product.productTitle}`,
-        order_id: order.id,
-        handler: async function (response) {
-          try {
-            // Verify payment
-            const verifyResponse = await paymentService.verifyPayment({
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
-              cartItems: [
-                {
-                  id: product._id,
-                  title: product.productTitle,
-                  price: product.price,
-                  quantity: selectedQuantity,
-                  seller: product.userId?.name || "Unknown Seller",
-                  sellerId: product.userId?._id,
-                },
-              ],
-            });
-
-            if (verifyResponse.success) {
-              alert("Payment successful! Your order has been placed.");
-              navigate("/dashboard/orders-placed");
-            } else {
-              throw new Error("Payment verification failed");
-            }
-          } catch (error) {
-            console.error("Payment verification error:", error);
-            alert("Payment verification failed. Please contact support.");
-          }
-        },
-        prefill: {
-          name: "",
-          email: "",
-          contact: "",
-        },
-        theme: {
-          color: "#782355",
-        },
-        modal: {
-          ondismiss: function () {
-            setIsProcessingPayment(false);
-          },
-        },
-      };
-
-      // Open Razorpay checkout
-      await openRazorpayCheckout(options);
-    } catch (error) {
-      console.error("Buy now error:", error);
-      alert("Purchase failed: " + (error.message || "Unknown error"));
-      setIsProcessingPayment(false);
-    }
+    // Navigate to checkout page with product data
+    navigate("/checkout", {
+      state: {
+        type: "single-product",
+        product: product,
+        quantity: selectedQuantity,
+      },
+    });
   };
 
   const handleToggleWishlist = async () => {

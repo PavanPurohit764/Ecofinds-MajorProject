@@ -290,14 +290,16 @@ export default function AuthForm({ isLogin = true, onToggle, onSuccess }) {
                 Verification email sent! Check your inbox.
               </p>
               {countdown > 0 ? (
-                <p className="text-xs text-gray-500 mt-1">
-                  Resend OTP in 0:{countdown.toString().padStart(2, "0")}
-                </p>
+                <div className="mt-2 inline-block bg-gray-50 px-3 py-1.5 rounded-md border border-gray-200">
+                  <p className="text-sm font-medium text-gray-600">
+                    Resend OTP in <span className="font-bold text-[#782355]">0:{countdown.toString().padStart(2, "0")}</span>
+                  </p>
+                </div>
               ) : (
                 <button
                   type="button"
                   onClick={handleResendOtp}
-                  className="text-xs text-[#782355] hover:text-[#5e1942] hover:underline mt-1 cursor-pointer font-medium bg-[#782355] hover:bg-[#78355d] px-2 py-1 rounded transition-all"
+                  className="mt-2 text-sm text-white bg-[#782355] hover:bg-[#5e1942] cursor-pointer font-medium px-4 py-1.5 rounded-md transition-all shadow-sm active:scale-95 inline-flex items-center"
                 >
                   Didn't receive OTP? Resend
                 </button>

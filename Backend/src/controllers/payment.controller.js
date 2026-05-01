@@ -15,7 +15,7 @@ const razorpay = new Razorpay({
 
 // Create Razorpay order
 const createOrder = asyncHandler(async (req, res) => {
-  const { items, totalAmount, currency = 'INR' } = req.body;
+  const { items, totalAmount, currency = 'INR', shippingAddress } = req.body;
 
   if (!req.user) {
     throw new apiError(401, "User authentication required");
@@ -127,7 +127,8 @@ const createOrder = asyncHandler(async (req, res) => {
       currency: currency,
       razorpayOrderId: razorpayOrder.id,
       status: 'pending',
-      paymentStatus: 'pending'
+      paymentStatus: 'pending',
+      deliveryAddress: shippingAddress || '',
     };
 
     const order = new Order(orderData);

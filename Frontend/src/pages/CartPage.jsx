@@ -10,10 +10,6 @@ import {
   ShieldCheckIcon,
 } from "@heroicons/react/24/outline";
 import { useCart } from "../hooks/useCart";
-import {
-  paymentService,
-  openRazorpayCheckout,
-} from "../services/paymentService";
 import Navbar from "../components/landing/Navbar";
 import Footer from "../components/landing/Footer";
 
@@ -27,94 +23,29 @@ const CartPage = () => {
   } = useCart();
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
-  // Handle checkout with Razorpay
-  const handleCheckout = async () => {
+  // Handle checkout - navigate to checkout page
+  const handleCheckout = () => {
     if (cartItems.length === 0) {
       alert("Your cart is empty");
       return;
     }
 
-    // Prevent double clicking
-    if (isProcessingPayment) {
-      console.log("Payment already in progress, ignoring click");
-      return;
-    }
-
-    setIsProcessingPayment(true);
-
-    try {
-      // Create order in backend
-      const orderData = {
-        items: cartItems.map((item) => ({
-          productId: item.id,
-          quantity: item.quantity,
+    navigate("/checkout", {
+      state: {
+        type: "cart",
+        cartItems: cartItems.map((item) => ({
+          id: item.id,
+          title: item.title,
           price: item.price,
+          quantity: item.quantity,
+          image: item.image,
+          seller: item.seller,
+          sellerId: item.sellerId,
+          condition: item.condition,
+          location: item.location,
         })),
-        totalAmount: total,
-        currency: "INR",
-      };
-
-      const orderResponse = await paymentService.createOrder(orderData);
-
-      if (!orderResponse.success) {
-        throw new Error(orderResponse.message || "Failed to create order");
-      }
-
-      const { order } = orderResponse.data;
-
-      // Razorpay options
-      const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_U0JVBIF0p05ory",
-        amount: order.amount,
-        currency: order.currency,
-        name: "EcoFinds",
-        description: "Purchase from Cart",
-        order_id: order.id,
-        handler: async function (response) {
-          try {
-            // Verify payment
-            const verifyResponse = await paymentService.verifyPayment({
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
-              cartItems: cartItems,
-            });
-
-            if (verifyResponse.success) {
-              alert("Payment successful! Your order has been placed.");
-              // Clear cart and redirect
-              cartItems.forEach((item) => removeFromCart(item.id));
-              navigate("/dashboard/orders-placed");
-            } else {
-              throw new Error("Payment verification failed");
-            }
-          } catch (error) {
-            console.error("Payment verification error:", error);
-            alert("Payment verification failed. Please contact support.");
-          }
-        },
-        prefill: {
-          name: "",
-          email: "",
-          contact: "",
-        },
-        theme: {
-          color: "#782355",
-        },
-        modal: {
-          ondismiss: function () {
-            setIsProcessingPayment(false);
-          },
-        },
-      };
-
-      // Open Razorpay checkout
-      await openRazorpayCheckout(options);
-    } catch (error) {
-      console.error("Checkout error:", error);
-      alert("Checkout failed: " + (error.message || "Unknown error"));
-      setIsProcessingPayment(false);
-    }
+      },
+    });
   };
 
   // Calculate totals
