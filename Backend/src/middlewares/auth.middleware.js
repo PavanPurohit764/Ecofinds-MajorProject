@@ -31,6 +31,10 @@ const verifyJWT = asynchandler(async (req, _, next) => {
       throw new apiError(401, "Invalid token - user not found");
     }
 
+    if (user.isSuspended) {
+      throw new apiError(403, "Your account has been suspended by the administrator");
+    }
+
     req.user = user;
 
     next();

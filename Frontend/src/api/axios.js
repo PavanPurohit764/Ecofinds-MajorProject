@@ -111,6 +111,19 @@ apiClient.interceptors.response.use(
       }
     }
 
+    // Handle 403 (Forbidden) errors (e.g., account suspended)
+    if (error.response?.status === 403) {
+      const errorMsg = error.response?.data?.message || "";
+      if (errorMsg.toLowerCase().includes("suspended")) {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("user");
+        // Only redirect if not already on the auth page to prevent loops
+        if (window.location.pathname !== "/auth") {
+          window.location.href = "/auth";
+        }
+      }
+    }
+
     // Handle 304 responses (not modified - cached)
     if (error.response?.status === 304) {
       console.info("📦 Using cached response for:", originalRequest?.url);
