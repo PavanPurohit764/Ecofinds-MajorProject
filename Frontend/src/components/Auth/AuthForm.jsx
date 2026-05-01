@@ -145,6 +145,8 @@ export default function AuthForm({ isLogin = true, onToggle, onSuccess }) {
         navigate("/");
       } catch (error) {
         console.error("Login failed:", error);
+        const errorMessage = error.response?.data?.message || error.message || "Login failed. Please try again.";
+        alert(errorMessage);
       } finally {
         setLocalLoading(false);
       }

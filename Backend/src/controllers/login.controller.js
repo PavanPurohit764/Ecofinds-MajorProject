@@ -73,6 +73,10 @@ const loginUser = asynchandler(async (req, res) => {
     throw new apiError(404, "User not found");
   }
 
+  if (user.isSuspended) {
+    throw new apiError(403, "Your account has been suspended by the administrator");
+  }
+
   console.log("Attempting password verification...");
   console.log("Raw password from request:", password);
   console.log("Stored password hash:", user.password);
