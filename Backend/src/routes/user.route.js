@@ -7,6 +7,7 @@ const {
   debugCheckUser,
   fixCorruptedUsername,
   resetUserPassword,
+  searchUsers,
 } = require("../controllers/user.controller");
 const upload = require("../middlewares/multer.middleware");
 const { loginUser, logoutUser } = require("../controllers/login.controller");
@@ -53,15 +54,13 @@ router.patch("/update-account", verifyJWT, updateAccountDetails); // Route to up
 router.patch(
   "/change-avatar",
   verifyJWT,
-  upload.single("avatar"),
   changeAvatar
-); // Route to change the avatar using multer
+); // Route to change the avatar
 router.patch(
   "/change-cover-images",
   verifyJWT,
-  upload.array("cover images", 5),
   changeCoverImages
-); // Route to change the cover images using multer
+); // Route to change the cover images
 // router.get('/watch-history', verifyJWT, getWatchhistory);    // Route to get the watch history - TODO: Implement this function
 // router.get('/profile/:username',verifyJWT, AddProfileDetails);    // Route to get profile details - TODO: Implement this function
 
@@ -78,6 +77,9 @@ router.post("/fix-username", fixCorruptedUsername); // Fix corrupted username en
 
 // Reset password route
 router.post("/reset-password", resetUserPassword); // Reset password for corrupted users
+
+// Search users for chat
+router.get("/search", verifyJWT, searchUsers);
 
 // router.post("/signup", signup);
 // router.route('/register').post(registerUser);    // Route to register a user (used chaining method syntax)

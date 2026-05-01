@@ -17,6 +17,12 @@ const UserSchema = new mongoose.Schema(
       trim: true,
       index: true,
     },
+    avatar: {
+      type: String, // URL for profile picture
+    },
+    profileImage: {
+      type: String, // Alternative field name for profile picture
+    },
     fullname: {
       type: String,
       required: true,

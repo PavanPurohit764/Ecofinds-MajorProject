@@ -10,6 +10,8 @@ const asyncHandler = require("../utils/asynchandler");
 const ApiResponse = require("../utils/apiResponse");
 const ApiError = require("../utils/apiError");
 const mongoose = require("mongoose");
+const uploadOnCloudinary = require("../utils/cloudinary");
+const { canResendOTP } = require("../utils/otpGenerator");
 
 // Get comprehensive user profile with sample and product information
 const getUserCompleteProfile = asyncHandler(async (req, res) => {
@@ -1599,17 +1601,26 @@ const respondToConnectionRequest = asyncHandler(async (req, res) => {
 
 // Upload profile picture
 const uploadProfilePicture = asyncHandler(async (req, res) => {
-  if (!req.file) {
+  const file = req.files?.profilePicture || req.files?.avatar;
+
+  if (!file) {
     throw new ApiError(400, "Profile picture file is required");
   }
 
-  // Here you would typically upload to Cloudinary
-  // For now, just returning a placeholder response
-  const imageUrl = `/uploads/profiles/${req.file.filename}`;
+  const uploadResponse = await uploadOnCloudinary(file.tempFilePath);
+
+  if (!uploadResponse) {
+    throw new ApiError(500, "Failed to upload profile picture to Cloudinary");
+  }
+
+  const imageUrl = uploadResponse.url;
 
   const updatedUser = await User.findByIdAndUpdate(
     req.user._id,
-    { profilePicture: imageUrl },
+    { 
+      profileImage: imageUrl,
+      avatar: imageUrl
+    },
     { new: true }
   ).select("-password -refresh_token");
 
@@ -1626,12 +1637,19 @@ const uploadProfilePicture = asyncHandler(async (req, res) => {
 
 // Upload cover image
 const uploadCoverImage = asyncHandler(async (req, res) => {
-  if (!req.file) {
+  const file = req.files?.coverImage;
+
+  if (!file) {
     throw new ApiError(400, "Cover image file is required");
   }
 
-  // Here you would typically upload to Cloudinary
-  const imageUrl = `/uploads/covers/${req.file.filename}`;
+  const uploadResponse = await uploadOnCloudinary(file.tempFilePath);
+
+  if (!uploadResponse) {
+    throw new ApiError(500, "Failed to upload cover image to Cloudinary");
+  }
+
+  const imageUrl = uploadResponse.url;
 
   const updatedUser = await User.findByIdAndUpdate(
     req.user._id,

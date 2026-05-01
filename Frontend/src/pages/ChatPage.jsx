@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { useChat } from '../context/ChatContext';
 import { useAuth } from '../context/AuthContext';
 import { FiSend, FiUser, FiInfo, FiPlus, FiSettings, FiLogOut, FiEdit2 } from 'react-icons/fi'; // Assumed icon library already used
-import axios from 'axios'; // For user search if needed, or use a service
+import apiClient from '../api/axios';
 
 const ChatPage = () => {
     const { user } = useAuth();
@@ -33,6 +33,7 @@ const ChatPage = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [loadingSearch, setLoadingSearch] = useState(false);
+    const [searchError, setSearchError] = useState(null);
 
     // Group Settings states
     const [showSettingsModal, setShowSettingsModal] = useState(false);
@@ -67,14 +68,22 @@ const ChatPage = () => {
 
     const handleSearch = async (query) => {
         setLoadingSearch(true);
+        setSearchError(null);
         try {
-            // Adjust search endpoint if necessary. Standard user search
-            const { data } = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/users/search?q=${query}`, {
-                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-            });
-            setSearchResults(data.users || []);
+            console.log(`[FRONTEND] Searching for: ${query}`);
+            const { data } = await apiClient.get(`/users/search?q=${query}`);
+            console.log('[FRONTEND] Search Response:', data);
+            
+            // Success response format: { success: true, message: "...", data: { users: [...] } }
+            const usersFound = data.data?.users || [];
+            setSearchResults(usersFound);
+            
+            if (usersFound.length === 0) {
+                console.warn(`[FRONTEND] No users found for query: ${query}`);
+            }
         } catch (error) {
             console.error('Search failed:', error);
+            setSearchError(error.response?.data?.message || 'Failed to search users. Please try again.');
         } finally {
             setLoadingSearch(false);
         }
@@ -97,6 +106,16 @@ const ChatPage = () => {
             setSelectedUsers(selectedUsers.filter(u => u._id !== userToAdd._id));
         } else {
             setSelectedUsers([...selectedUsers, userToAdd]);
+        }
+    };
+
+    const handleStartIndividualChat = async (userId) => {
+        const chat = await accessChat(userId);
+        if (chat) {
+            setActiveChat(chat);
+            setShowGroupModal(false);
+            setSearchQuery('');
+            setSearchResults([]);
         }
     };
 
@@ -172,8 +191,8 @@ const ChatPage = () => {
                                         >
                                             <div className="flex items-center space-x-3">
                                                 <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden">
-                                                    {partner?.profileImage ? (
-                                                        <img src={partner.profileImage} alt={partner.name} className="w-full h-full object-cover" />
+                                                    {(partner?.profileImage || partner?.avatar) ? (
+                                                        <img src={partner.profileImage || partner.avatar} alt={partner.name} className="w-full h-full object-cover" />
                                                     ) : (
                                                         <FiUser className="h-6 w-6 text-gray-500" />
                                                     )}
@@ -224,8 +243,8 @@ const ChatPage = () => {
                                     return (
                                         <>
                                             <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden">
-                                                {partner?.profileImage ? (
-                                                    <img src={partner.profileImage} alt={partner.name} className="w-full h-full object-cover" />
+                                                {(partner?.profileImage || partner?.avatar) ? (
+                                                    <img src={partner.profileImage || partner.avatar} alt={partner.name} className="w-full h-full object-cover" />
                                                 ) : (
                                                     <FiUser className="h-5 w-5 text-gray-500" />
                                                 )}
@@ -350,19 +369,43 @@ const ChatPage = () => {
                                 {loadingSearch && <div className="mt-2 text-xs text-gray-500 italic">Searching...</div>}
 
                                 <div className="mt-2 max-h-40 overflow-y-auto space-y-1">
+                                    {loadingSearch && (
+                                        <div className="flex items-center justify-center py-4 text-xs text-gray-500 italic">
+                                            <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-green-600 mr-2"></div>
+                                            Searching...
+                                        </div>
+                                    )}
+                                    
+                                    {searchError && (
+                                        <div className="text-center py-2 text-xs text-red-500 bg-red-50 rounded-lg">
+                                            {searchError}
+                                        </div>
+                                    )}
+
+                                    {!loadingSearch && !searchError && searchQuery.trim().length > 1 && searchResults.length === 0 && (
+                                        <div className="text-center py-4 text-xs text-gray-500 italic">
+                                            No users found for "{searchQuery}"
+                                        </div>
+                                    )}
+
                                     {searchResults.map(u => (
                                         <div
                                             key={u._id}
-                                            onClick={() => handleToggleUserSelection(u)}
-                                            className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg cursor-pointer"
+                                            className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg group"
                                         >
-                                            <div className="flex items-center space-x-2">
+                                            <div className="flex items-center space-x-2 flex-1 cursor-pointer" onClick={() => handleStartIndividualChat(u._id)}>
                                                 <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-                                                    {u.profileImage ? <img src={u.profileImage} alt={u.name} className="w-full h-full object-cover" /> : <FiUser size={14} />}
+                                                    {u.avatar || u.profileImage ? <img src={u.avatar || u.profileImage} alt={u.name} className="w-full h-full object-cover" /> : <FiUser size={14} />}
                                                 </div>
-                                                <span className="text-sm font-medium">{u.name}</span>
+                                                <div>
+                                                    <div className="text-sm font-medium">{u.name}</div>
+                                                    <div className="text-[10px] text-gray-500">@{u.username}</div>
+                                                </div>
                                             </div>
-                                            <div className={`w-5 h-5 rounded-full border flex items-center justify-center ${selectedUsers.find(sel => sel._id === u._id) ? 'bg-green-500 border-green-500 text-white' : 'border-gray-300'}`}>
+                                            <div 
+                                                onClick={() => handleToggleUserSelection(u)}
+                                                className={`w-5 h-5 rounded-full border flex items-center justify-center cursor-pointer ${selectedUsers.find(sel => sel._id === u._id) ? 'bg-green-500 border-green-500 text-white' : 'border-gray-300'}`}
+                                            >
                                                 {selectedUsers.find(sel => sel._id === u._id) && <span>&check;</span>}
                                             </div>
                                         </div>
@@ -431,7 +474,7 @@ const ChatPage = () => {
                                     {activeChat.users.map(u => (
                                         <div key={u._id} className="flex items-center space-x-2 text-sm">
                                             <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-                                                {u.profileImage ? <img src={u.profileImage} alt={u.name} className="w-full h-full object-cover" /> : <FiUser size={14} />}
+                                                {(u.profileImage || u.avatar) ? <img src={u.profileImage || u.avatar} alt={u.name} className="w-full h-full object-cover" /> : <FiUser size={14} />}
                                             </div>
                                             <span className="flex-1 truncate">{u.name} {u._id === user._id && '(You)'}</span>
                                             {activeChat.groupAdmin?._id === user._id && u._id !== user._id && (

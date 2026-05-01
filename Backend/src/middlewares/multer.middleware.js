@@ -5,8 +5,8 @@ const storage = multer.diskStorage({
       cb(null, './public/temp'); // Specify the directory to save the uploaded files
     },
     filename: (req, file, cb) => {
-     
-      cb(null, file.filename); // Generate a unique filename
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      cb(null, file.fieldname + '-' + uniqueSuffix + '-' + file.originalname);
     }
   });
 

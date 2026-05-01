@@ -194,221 +194,240 @@ const SearchResults = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header with Back Button */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <button 
-            onClick={() => navigate('/')}
-            className="flex items-center text-gray-600 hover:text-gray-900 transition-colors duration-200 mb-4"
-          >
-            <ChevronLeftIcon className="h-5 w-5 mr-2" />
-            Back to Home
-          </button>
-          
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900 mb-1">
-                Search Results
-              </h1>
-              <p className="text-gray-600">
-                {searchInfo.totalCount} products found for "{searchInfo.query}"
-                {filteredResults.length !== allResults.length && (
-                  <span className="text-[#9d174d] font-medium">
-                    {" "}({filteredResults.length} after filters)
-                  </span>
-                )}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Filter and Sort Bar */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-4">
-              <button
-                className="lg:hidden flex items-center text-gray-700 bg-gray-100 px-3 py-1.5 rounded-md text-sm font-medium"
-                onClick={() => setIsFilterOpen(true)}
+    <div className="min-h-screen bg-[#fdfafb]">
+      {/* Fixed Sticky Header for Search Context */}
+      <div className="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-30 shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="h-20 flex items-center justify-between gap-6">
+            <div className="flex items-center gap-5">
+              <button 
+                onClick={() => navigate('/')}
+                className="hidden sm:flex items-center justify-center w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-[#9d174d] hover:text-white transition-all duration-300 shadow-sm border border-gray-100"
               >
-                <FunnelIcon className="h-4 w-4 mr-1.5" />
-                Filters
-                {(filters.condition !== 'all' || filters.minPrice || filters.maxPrice || filters.location) && (
-                  <span className="ml-1.5 bg-[#9d174d] text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center">
-                    !
-                  </span>
-                )}
+                <ChevronLeftIcon className="h-5 w-5" />
               </button>
-              <span className="hidden sm:inline text-sm text-gray-600">Sort by:</span>
+              <div>
+                <h1 className="text-xl font-bold text-gray-900 tracking-tight leading-tight">
+                  Listing Results
+                </h1>
+                <p className="text-xs font-medium text-gray-500 mt-0.5 flex items-center">
+                  <span className="text-[#9d174d] font-semibold">{filteredResults.length}</span>
+                  <span className="mx-1">results found for</span>
+                  <span className="bg-gray-100 px-1.5 py-0.5 rounded text-gray-700">"{searchInfo.query}"</span>
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className="hidden sm:flex items-center bg-gray-50 rounded-xl p-1 border border-gray-100">
+                {['featured', 'price-low', 'price-high'].map((opt) => (
+                  <button
+                    key={opt}
+                    onClick={() => setSortBy(opt)}
+                    className={`px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-lg transition-all duration-200 ${
+                      sortBy === opt ? 'bg-white text-[#9d174d] shadow-sm' : 'text-gray-400 hover:text-gray-600'
+                    }`}
+                  >
+                    {opt.replace('-', ' ')}
+                  </button>
+                ))}
+                <div className="relative group ml-1">
+                  <select 
+                    value={sortBy === 'newest' ? 'newest' : ''}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="appearance-none bg-transparent pl-2 pr-6 py-1.5 text-xs font-bold uppercase tracking-wider text-gray-400 hover:text-gray-600 focus:outline-none cursor-pointer"
+                  >
+                    <option value="" disabled hidden>More</option>
+                    <option value="newest">Newest</option>
+                  </select>
+                  <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none">
+                    <svg className="w-3 h-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              {/* Mobile Sort Select */}
               <select 
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="border border-gray-300 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#9d174d] focus:border-transparent"
+                className="sm:hidden bg-gray-50 border-gray-100 rounded-lg text-xs font-bold uppercase p-2 focus:ring-1 focus:ring-[#9d174d]"
               >
                 <option value="featured">Featured</option>
-                <option value="price-low">Price: Low to High</option>
-                <option value="price-high">Price: High to Low</option>
-                <option value="newest">Newest First</option>
+                <option value="price-low">Low Price</option>
+                <option value="price-high">High Price</option>
+                <option value="newest">Newest</option>
               </select>
-            </div>
-            <div className="text-sm text-gray-500 hidden sm:block">
-              Showing {filteredResults.length} of {searchInfo.totalCount} products
+
+              <button
+                className="lg:hidden flex items-center justify-center w-10 h-10 rounded-xl bg-gray-50 text-gray-600 border border-gray-100 relative"
+                onClick={() => setIsFilterOpen(true)}
+              >
+                <FunnelIcon className="h-5 w-5" />
+                {(filters.condition !== 'all' || filters.minPrice || filters.maxPrice || filters.location) && (
+                  <span className="absolute top-2 right-2 w-2 h-2 bg-[#9d174d] rounded-full ring-2 ring-white"></span>
+                )}
+              </button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Results Section with Filters */}
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Filters Sidebar - Mobile Drawer & Desktop Sidebar */}
+      {/* Main Content Area */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        <div className="flex flex-col lg:flex-row gap-10 items-start">
           
-          {/* Mobile backdrop */}
-          {isFilterOpen && (
-            <div
-              className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          {/* Enhanced Filter Sidebar */}
+          <aside className={`
+            fixed lg:static inset-0 z-40 lg:z-auto 
+            ${isFilterOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none lg:opacity-100 lg:pointer-events-auto'}
+            transition-all duration-300
+            lg:w-72 w-full
+          `}>
+            {/* Mobile Backdrop */}
+            <div 
+              className="absolute inset-0 bg-black/20 backdrop-blur-sm lg:hidden"
               onClick={() => setIsFilterOpen(false)}
             />
-          )}
-
-          <div
-            className={`fixed inset-y-0 left-0 bg-white z-50 w-[80%] max-w-sm transform transition-transform duration-300 ease-in-out lg:static lg:transform-none lg:w-64 lg:flex-shrink-0 overflow-y-auto ${
-              isFilterOpen ? "translate-x-0" : "-translate-x-full"
-            }`}
-          >
-            <div className="bg-white rounded-none lg:rounded-lg shadow-none lg:shadow-sm border-0 lg:border border-gray-200 p-6 min-h-screen lg:min-h-0">
-              {/* Filters Header */}
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-                  <FunnelIcon className="w-5 h-5 mr-2" />
-                  Filters
-                  {(filters.condition !== 'all' || filters.minPrice || filters.maxPrice || filters.location) && (
-                    <span className="ml-2 px-2 py-1 text-xs bg-[#9d174d] text-white rounded-full">
-                      Applied
-                    </span>
-                  )}
-                </h3>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={clearAllFilters}
-                    className="text-sm text-[#9d174d] hover:text-[#7f1d1d] font-medium disabled:opacity-50"
-                    disabled={filters.condition === 'all' && !filters.minPrice && !filters.maxPrice && !filters.location}
-                  >
-                    Clear All
-                  </button>
-                  <button
-                    className="lg:hidden p-1 text-gray-400 hover:text-gray-500"
-                    onClick={() => setIsFilterOpen(false)}
-                  >
-                    <XMarkIcon className="h-6 w-6" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Condition Filter */}
-              <div className="mb-6">
-                <h4 className="font-medium text-gray-900 mb-3">Condition</h4>
-                <div className="space-y-2">
-                  {['all', 'new', 'like new', 'good', 'fair', 'used'].map((condition) => (
-                    <label key={condition} className="flex items-center">
-                      <input
-                        type="radio"
-                        name="condition"
-                        value={condition}
-                        checked={filters.condition === condition}
-                        onChange={(e) => handleFilterChange('condition', e.target.value)}
-                        className="w-4 h-4 text-[#9d174d] border-gray-300 focus:ring-[#9d174d]"
-                      />
-                      <span className="ml-2 text-sm text-gray-700 capitalize">
-                        {condition === 'all' ? 'All' : condition}
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* Price Range Filter */}
-              <div className="mb-6">
-                <h4 className="font-medium text-gray-900 mb-3">Price Range</h4>
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="number"
-                      placeholder="0"
-                      value={filters.minPrice}
-                      onChange={(e) => handleFilterChange('minPrice', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#9d174d] focus:border-transparent"
-                    />
-                    <span className="text-gray-500 text-sm">to</span>
-                    <input
-                      type="number"
-                      placeholder="200000"
-                      value={filters.maxPrice}
-                      onChange={(e) => handleFilterChange('maxPrice', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#9d174d] focus:border-transparent"
-                    />
-                  </div>
-                  <div className="text-xs text-gray-500">
-                    ₹{filters.minPrice || '0'} - ₹{filters.maxPrice || '2,00,000'}
+            
+            <div className={`
+              absolute lg:relative left-0 top-0 h-full lg:h-auto w-[300px] lg:w-full bg-white lg:bg-transparent shadow-2xl lg:shadow-none 
+              transform transition-transform duration-300 ease-out lg:transform-none
+              ${isFilterOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+              flex flex-col lg:block bg-white lg:rounded-3xl lg:border lg:border-gray-100 lg:shadow-sm overflow-hidden
+            `}>
+              <div className="p-7">
+                <div className="flex items-center justify-between mb-8">
+                  <h3 className="text-lg font-bold text-gray-900 flex items-center">
+                    <FunnelIcon className="w-5 h-5 mr-2.5 text-[#9d174d]" />
+                    Filters
+                  </h3>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={clearAllFilters}
+                      className="text-xs font-bold uppercase tracking-wider text-[#9d174d] hover:text-[#7f1d1d] disabled:opacity-30"
+                      disabled={filters.condition === 'all' && !filters.minPrice && !filters.maxPrice && !filters.location}
+                    >
+                      Clear All
+                    </button>
+                    <button className="lg:hidden p-1 text-gray-400" onClick={() => setIsFilterOpen(false)}>
+                      <XMarkIcon className="h-6 w-6" />
+                    </button>
                   </div>
                 </div>
-              </div>
 
-              {/* Location Filter */}
-              <div className="mb-6">
-                <h4 className="font-medium text-gray-900 mb-3">Location</h4>
-                <input
-                  type="text"
-                  placeholder="Enter city or area"
-                  value={filters.location}
-                  onChange={(e) => handleFilterChange('location', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#9d174d] focus:border-transparent"
-                />
-              </div>
+                {/* Condition Filter */}
+                <div className="mb-8">
+                  <h4 className="text-[11px] font-black uppercase tracking-[0.2em] text-gray-400 mb-4">Condition</h4>
+                  <div className="space-y-3">
+                    {['all', 'new', 'like new', 'good', 'fair', 'used'].map((condition) => (
+                      <label key={condition} className="flex items-center cursor-pointer group">
+                        <input
+                          type="radio"
+                          name="condition"
+                          value={condition}
+                          checked={filters.condition === condition}
+                          onChange={(e) => handleFilterChange('condition', e.target.value)}
+                          className="w-4 h-4 text-[#9d174d] border-gray-300 focus:ring-[#9d174d]"
+                        />
+                        <span className="ml-3 text-sm font-semibold text-gray-600 capitalize group-hover:text-gray-900 transition-colors">
+                          {condition === 'all' ? 'Any Condition' : condition}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
 
-              {/* Filter Results Summary */}
-              <div className="pt-4 border-t border-gray-200">
-                <div className="text-sm text-gray-600">
-                  <div className="flex justify-between items-center mb-2">
-                    <span>Total found:</span>
-                    <span className="font-medium">{allResults.length}</span>
+                {/* Price Range Filter */}
+                <div className="mb-8">
+                  <h4 className="text-[11px] font-black uppercase tracking-[0.2em] text-gray-400 mb-4">Price Range</h4>
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-2">
+                      <div className="relative flex-1">
+                        <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-300 text-[10px] font-bold">₹</span>
+                        <input
+                          type="number"
+                          placeholder="Min"
+                          value={filters.minPrice}
+                          onChange={(e) => handleFilterChange('minPrice', e.target.value)}
+                          className="w-full pl-6 pr-2 py-2.5 bg-gray-50 border-none rounded-xl text-xs font-bold text-gray-700 placeholder:text-gray-300 focus:ring-2 focus:ring-[#9d174d]/10 transition-all"
+                        />
+                      </div>
+                      <span className="text-gray-300 text-[10px] font-black uppercase">to</span>
+                      <div className="relative flex-1">
+                        <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-300 text-[10px] font-bold">₹</span>
+                        <input
+                          type="number"
+                          placeholder="Max"
+                          value={filters.maxPrice}
+                          onChange={(e) => handleFilterChange('maxPrice', e.target.value)}
+                          className="w-full pl-6 pr-2 py-2.5 bg-gray-50 border-none rounded-xl text-xs font-bold text-gray-700 placeholder:text-gray-300 focus:ring-2 focus:ring-[#9d174d]/10 transition-all"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Location Filter */}
+                <div className="mb-8">
+                  <h4 className="text-[11px] font-black uppercase tracking-[0.2em] text-gray-400 mb-4">Location</h4>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="Enter city or area..."
+                      value={filters.location}
+                      onChange={(e) => handleFilterChange('location', e.target.value)}
+                      className="w-full pl-4 pr-10 py-2.5 bg-gray-50 border-none rounded-xl text-xs font-bold text-gray-700 placeholder:text-gray-300 focus:ring-2 focus:ring-[#9d174d]/10 transition-all"
+                    />
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300">
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Summary Section */}
+                <div className="pt-6 border-t border-gray-100 mt-2">
+                  <div className="flex justify-between items-center mb-1.5">
+                    <span className="text-[10px] font-black uppercase tracking-[0.15em] text-gray-400">Products</span>
+                    <span className="text-xs font-black text-gray-900">{allResults.length} Found</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span>Showing:</span>
-                    <span className="font-medium text-[#9d174d]">{filteredResults.length}</span>
+                    <span className="text-[10px] font-black uppercase tracking-[0.15em] text-gray-400">Showing</span>
+                    <span className="text-xs font-black text-[#9d174d]">{filteredResults.length} Filtered</span>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+          </aside>
 
-          {/* Results Content */}
-          <div className="flex-1">
+          {/* Results Main Content Area */}
+          <main className="flex-1 w-full min-w-0">
             {filteredResults.length === 0 ? (
-              <div className="text-center py-16">
-                <MagnifyingGlassIcon className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-xl font-medium text-gray-900 mb-2">
-                  {allResults.length === 0 ? 'No results found' : 'No results match your filters'}
-                </h3>
-                <p className="text-gray-500 mb-4">
+              <div className="bg-white rounded-3xl border border-dashed border-gray-200 py-24 px-6 text-center shadow-sm">
+                <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <MagnifyingGlassIcon className="h-10 w-10 text-gray-300" />
+                </div>
+                <h3 className="text-2xl font-extrabold text-gray-900 mb-3 tracking-tight">No results matched</h3>
+                <p className="text-gray-500 max-w-sm mx-auto mb-8 font-medium">
                   {allResults.length === 0 
-                    ? 'Try searching with different keywords' 
-                    : 'Try adjusting your filters or clear all filters to see more results'
+                    ? `We couldn't find anything for "${searchInfo.query}". Try a different term?` 
+                    : 'Adjust your current filters to find more options.'
                   }
                 </p>
                 {allResults.length > 0 && (
                   <button
                     onClick={clearAllFilters}
-                    className="px-4 py-2 bg-[#9d174d] text-white rounded-lg hover:bg-[#7f1d1d] transition-colors duration-200"
+                    className="inline-flex items-center px-6 py-3 bg-[#9d174d] text-white font-bold rounded-2xl hover:bg-[#7f1d1d] hover:scale-105 active:scale-95 transition-all shadow-lg shadow-[#9d174d]/20"
                   >
-                    Clear All Filters
+                    Reset all filters
                   </button>
                 )}
               </div>
             ) : (
-              <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-8">
                 {filteredResults.map((item, index) => {
                   const itemId = item._id || `${item.source}-${index}`;
                   const isFavorite = favorites.has(itemId);
@@ -419,112 +438,112 @@ const SearchResults = () => {
                   const imageUrl = item.imageUrls?.[0] || item.imageDetails?.[0]?.url;
                   
                   return (
-                    <div key={itemId} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow duration-200 group">
-                      {/* Image Container */}
-                      <div className="relative h-48 bg-gray-100">
+                    <div 
+                      key={itemId} 
+                      className="group bg-white rounded-3xl border border-gray-100 overflow-hidden hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] hover:-translate-y-2 transition-all duration-500 flex flex-col h-full ring-1 ring-gray-900/5 shadow-[0_2px_4px_rgba(0,0,0,0.02)]"
+                    >
+                      {/* Premium Image Section */}
+                      <div className="relative h-60 overflow-hidden bg-gray-50">
                         {imageUrl ? (
                           <img 
                             src={imageUrl} 
                             alt={title}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center text-gray-400">
-                            <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
+                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 text-gray-300">
+                             <MagnifyingGlassIcon className="w-12 h-12 opacity-50" />
                           </div>
                         )}
                         
-                        {/* Favorite Button */}
-                        <button 
-                          onClick={() => toggleFavorite(itemId)}
-                          className="absolute top-3 right-3 p-2 rounded-full bg-white/80 hover:bg-white transition-colors duration-200"
-                        >
-                          {isFavorite ? (
-                            <HeartSolidIcon className="h-5 w-5 text-red-500" />
-                          ) : (
-                            <HeartIcon className="h-5 w-5 text-gray-600" />
-                          )}
-                        </button>
-
-                        {/* Condition Badge */}
-                        {item.condition && (
-                          <div className="absolute top-3 left-3">
-                            <span className={`px-2 py-1 text-xs font-medium rounded-full ${getConditionColor(item.condition)}`}>
+                        {/* Glassmorphism Actions Overlay */}
+                        <div className="absolute top-4 inset-x-4 flex justify-between items-start">
+                          {item.condition && (
+                            <span className={`px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.1em] rounded-lg backdrop-blur-md bg-white/90 shadow-sm border border-gray-100/50 ${
+                              item.condition.toLowerCase() === 'new' ? 'text-green-600' : 'text-[#9d174d]'
+                            }`}>
                               {item.condition}
                             </span>
-                          </div>
-                        )}
+                          )}
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); toggleFavorite(itemId); }}
+                            className="w-10 h-10 rounded-xl flex items-center justify-center backdrop-blur-md bg-white/90 shadow-lg border border-gray-100 text-gray-400 hover:scale-110 active:scale-90 transition-all group/pop"
+                          >
+                            {isFavorite ? (
+                              <HeartSolidIcon className="h-5 w-5 text-red-500 animate-pulse" />
+                            ) : (
+                              <HeartIcon className="h-5 w-5 group-hover/pop:text-red-400 transition-colors" />
+                            )}
+                          </button>
+                        </div>
 
-                        {/* Type Badge */}
-                        <div className="absolute bottom-3 left-3">
-                          <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                        {/* Source Tag */}
+                        <div className="absolute bottom-4 left-4">
+                          <span className={`px-2 py-1 text-[9px] font-bold uppercase tracking-wider rounded-md ${
                             item.source === 'product' 
-                              ? 'bg-blue-100 text-blue-800' 
-                              : 'bg-green-100 text-green-800'
-                          }`}>
-                            {item.type}
+                              ? 'bg-blue-500/10 text-blue-100 border border-blue-400/20' 
+                              : 'bg-emerald-500/10 text-emerald-100 border border-emerald-400/20'
+                          } backdrop-blur-sm`}>
+                            {item.source}
                           </span>
                         </div>
                       </div>
 
-                      {/* Content */}
-                      <div className="p-4">
-                        {/* Category */}
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-xs text-gray-500 uppercase tracking-wide">
-                            {category}
-                          </span>
-                          {item.location && (
-                            <span className="text-xs text-gray-400">
-                              {typeof item.location === 'string' ? item.location : item.location.address}
-                            </span>
-                          )}
-                        </div>
-
-                        {/* Title */}
-                        <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 leading-5">
-                          {title}
-                        </h3>
-
-                        {/* Description */}
-                        {description && (
-                          <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-                            {description}
-                          </p>
-                        )}
-
-                        {/* Price and Unit */}
-                        <div className="flex items-center justify-between mb-4">
-                          <div>
-                            <span className="text-xl font-bold text-gray-900">
-                              {formatPrice(price)}
-                            </span>
-                            {item.unit && (
-                              <span className="text-sm text-gray-500 ml-1">
-                                /{item.unit}
-                              </span>
+                      {/* Elevated Product Info */}
+                      <div className="p-6 flex flex-col flex-1">
+                        <div className="mb-4">
+                          <div className="flex items-center gap-2 mb-2 text-[10px] font-bold uppercase tracking-[0.1em] text-gray-400">
+                            <span className="truncate">{category || 'Eco Finding'}</span>
+                            {item.location && (
+                              <>
+                                <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
+                                <span className="truncate max-w-[120px]">
+                                  {typeof item.location === 'string' ? item.location : item.location.address}
+                                </span>
+                              </>
                             )}
                           </div>
-                          {item.quantityAvailable && (
-                            <span className="text-xs text-gray-500">
-                              {item.quantityAvailable} available
-                            </span>
-                          )}
+                          <h3 className="font-extrabold text-gray-900 group-hover:text-[#9d174d] text-lg leading-tight line-clamp-2 transition-colors min-h-[3rem]">
+                            {title}
+                          </h3>
                         </div>
 
-                        {/* View Details Button */}
-                        <button onClick={() => navigate(`/product/${item._id}`)} className="text-sm sm:text-base w-full bg-[#9d174d] text-white py-2 px-4 rounded-lg font-medium hover:bg-[#7f1d1d] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#9d174d] focus:ring-offset-2">
-                          View Details
-                        </button>
+                        <div className="mt-auto pt-4 flex flex-col gap-5 border-t border-gray-50">
+                           <div className="flex items-end justify-between">
+                             <div className="flex flex-col">
+                               <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Price</span>
+                               <div className="flex items-baseline gap-1">
+                                 <span className="text-2xl font-black text-gray-900 tracking-tight">
+                                   {formatPrice(price)}
+                                 </span>
+                                 {item.unit && <span className="text-sm font-bold text-gray-400">/{item.unit}</span>}
+                               </div>
+                             </div>
+                             {item.quantityAvailable && (
+                               <div className="text-right">
+                                 <span className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest mb-0.5">Stock</span>
+                                 <span className="text-[11px] font-extrabold text-[#9d174d] bg-[#9d174d]/5 px-2 py-0.5 rounded-full">{item.quantityAvailable} left</span>
+                               </div>
+                             )}
+                           </div>
+
+                          <button 
+                            onClick={() => navigate(`/product/${item._id}`)} 
+                            className="group/btn w-full bg-[#9d174d] hover:bg-[#7f1d1d] text-white h-14 rounded-2xl font-black text-sm uppercase tracking-[0.15em] transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#9d174d]/10 hover:shadow-[#9d174d]/30"
+                          >
+                            View Experience
+                            <svg className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                          </button>
+                        </div>
                       </div>
                     </div>
                   );
                 })}
               </div>
             )}
-          </div>
+          </main>
         </div>
       </div>
     </div>
