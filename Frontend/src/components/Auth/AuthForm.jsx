@@ -10,6 +10,7 @@ import {
 } from "react-icons/fa";
 import { useAuth } from '../../hooks/useAuth';
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 export default function AuthForm({ isLogin = true, onToggle, onSuccess }) {
   const {
@@ -146,7 +147,7 @@ export default function AuthForm({ isLogin = true, onToggle, onSuccess }) {
       } catch (error) {
         console.error("Login failed:", error);
         const errorMessage = error.response?.data?.message || error.message || "Login failed. Please try again.";
-        alert(errorMessage);
+        toast.error(errorMessage);
       } finally {
         setLocalLoading(false);
       }

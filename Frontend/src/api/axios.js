@@ -118,8 +118,8 @@ apiClient.interceptors.response.use(
         localStorage.removeItem("accessToken");
         localStorage.removeItem("user");
         // Only redirect if not already on the auth page to prevent loops
-        if (window.location.pathname !== "/auth") {
-          window.location.href = "/auth";
+        if (window.location.pathname !== "/authpage") {
+          window.location.href = "/authpage";
         }
       }
     }
